@@ -412,27 +412,63 @@ const INITIAL_SUPPLIERS = [
   },
 ];
 
+const INITIAL_SUPERADMIN = {
+  id: "sa-1",
+  name: "Super Admin",
+  username: "superadmin",
+  password: "admin123",
+  role: "Super Admin",
+  isSuperAdmin: true,
+  email: "admin@alkanzupholstery.com",
+  phone: "+971 50 000 0000",
+  status: "Active",
+};
+
 const INITIAL_STAFF = [
   {
     id: 1,
     name: "Mohammed Afsal",
+    username: "mohammed",
+    password: "staff123",
     role: "Master Upholsterer",
+    isSuperAdmin: false,
     phone: "+971 50 456 7890",
+    email: "mohammed@alkanzupholstery.com",
     status: "Active",
+    salary: 6500,
+    salaryPeriod: "Monthly",
+    attendance: 98,
+    performance: 95,
   },
   {
     id: 2,
     name: "Shameer",
+    username: "shameer",
+    password: "staff123",
     role: "Leather Technician",
+    isSuperAdmin: false,
     phone: "+971 52 567 8901",
+    email: "shameer@alkanzupholstery.com",
     status: "Active",
+    salary: 5500,
+    salaryPeriod: "Monthly",
+    attendance: 92,
+    performance: 90,
   },
   {
     id: 3,
     name: "Riyas",
+    username: "riyas",
+    password: "staff123",
     role: "Stitching Specialist",
+    isSuperAdmin: false,
     phone: "+971 55 678 9012",
+    email: "riyas@alkanzupholstery.com",
     status: "On Leave",
+    salary: 4800,
+    salaryPeriod: "Monthly",
+    attendance: 88,
+    performance: 85,
   },
 ];
 
@@ -616,12 +652,221 @@ const mapSupplier = (row) => ({
 const mapStaff = (row) => ({
   ...row,
   id: row.id, name: row.name || "", role: row.role || "Upholsterer", phone: row.phone || "", email: row.email || "",
+  username: row.username || "", password: row.password || "",
+  isSuperAdmin: row.is_superadmin === "true" || row.isSuperAdmin === true || row.is_superadmin === true || row.role === "Super Admin",
   address: row.address || "", emergencyContact: row.emergency_contact || row.emergencyContact || "", joiningDate: row.joining_date || row.joiningDate || "",
   bank: row.bank || "", iban: row.iban || "", salary: Number(row.salary || 0), salaryPeriod: row.salary_period || row.salaryPeriod || "Monthly",
   attendance: Number(row.attendance || 0), performance: Number(row.performance || 0), status: row.status || "Active", notes: row.notes || "",
 });
 
+/* ============================================================
+   AUTHENTICATION / LOGIN PAGE
+============================================================ */
+
+function LoginPage({ onLogin, staffList = [] }) {
+  const [loginMode, setLoginMode] = useState("admin");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleQuickLogin = (u, p, mode) => {
+    setUsername(u);
+    setPassword(p);
+    setLoginMode(mode);
+    submitLogin(u, p);
+  };
+
+  const submitLogin = (uVal, pVal) => {
+    const userToTest = uVal !== undefined ? uVal : username;
+    const passToTest = pVal !== undefined ? pVal : password;
+    
+    setError("");
+    if (!userToTest.trim() || !passToTest.trim()) {
+      setError("Please enter both username/ID and password.");
+      return;
+    }
+
+    setLoading(true);
+    setTimeout(() => {
+      const cleanUser = userToTest.trim().toLowerCase();
+      
+      if ((cleanUser === "superadmin" || cleanUser === "admin") && passToTest === "admin123") {
+        const adminUser = {
+          id: "sa-1",
+          name: "Super Admin",
+          username: "superadmin",
+          role: "Super Admin",
+          isSuperAdmin: true,
+          email: "admin@alkanzupholstery.com"
+        };
+        onLogin(adminUser);
+        setLoading(false);
+        return;
+      }
+
+      const matchedStaff = staffList.find(
+        (s) => (s.username && s.username.toLowerCase() === cleanUser) ||
+               (s.email && s.email.toLowerCase() === cleanUser) ||
+               (s.name && s.name.toLowerCase() === cleanUser)
+      );
+
+      if (matchedStaff) {
+        if (matchedStaff.status === "Disabled" || matchedStaff.status === "Inactive") {
+          setError("This staff account is currently disabled. Please contact Super Admin.");
+          setLoading(false);
+          return;
+        }
+
+        if (matchedStaff.password && matchedStaff.password !== passToTest) {
+          setError("Invalid password. Please try again.");
+          setLoading(false);
+          return;
+        }
+
+        const isSA = !!matchedStaff.isSuperAdmin || matchedStaff.role === "Super Admin" || matchedStaff.role === "Manager";
+        const userSession = {
+          id: matchedStaff.id,
+          name: matchedStaff.name,
+          username: matchedStaff.username || matchedStaff.name.toLowerCase().replace(/\s+/g, ""),
+          role: matchedStaff.role || (isSA ? "Super Admin" : "Staff"),
+          isSuperAdmin: isSA,
+          email: matchedStaff.email || "",
+          phone: matchedStaff.phone || ""
+        };
+        onLogin(userSession);
+        setLoading(false);
+        return;
+      }
+
+      setError("Invalid username or password. Try superadmin / admin123 or staff credentials.");
+      setLoading(false);
+    }, 350);
+  };
+
+  return (
+    <div className="login-screen">
+      <div className="login-container">
+        <div className="login-header">
+          <div className="login-logo-wrap">
+            <div className="login-logo-icon"><Sofa size={28} /></div>
+            <div>
+              <h2>AL KANZ UPHOLSTERY</h2>
+              <p>UAE WORKSHOP MANAGEMENT SYSTEM</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="login-card card">
+          <div className="login-tabs">
+            <button
+              type="button"
+              className={`login-tab ${loginMode === "admin" ? "active" : ""}`}
+              onClick={() => { setLoginMode("admin"); setError(""); }}
+            >
+              <ShieldCheck size={16} /> Super Admin
+            </button>
+            <button
+              type="button"
+              className={`login-tab ${loginMode === "staff" ? "active" : ""}`}
+              onClick={() => { setLoginMode("staff"); setError(""); }}
+            >
+              <Users size={16} /> Staff Login
+            </button>
+          </div>
+
+          <form onSubmit={(e) => { e.preventDefault(); submitLogin(); }}>
+            {error && (
+              <div className="login-error">
+                <AlertCircle size={16} />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <div className="login-field">
+              <label>
+                {loginMode === "admin" ? "Super Admin Username / Email" : "Staff ID or Username"}
+              </label>
+              <div className="login-input-wrap">
+                <UserCog size={18} />
+                <input
+                  type="text"
+                  placeholder={loginMode === "admin" ? "e.g. superadmin" : "e.g. mohammed"}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="login-field">
+              <label>Password</label>
+              <div className="login-input-wrap">
+                <Lock size={18} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword((v) => !v)}
+                >
+                  <Eye size={16} />
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" className="primary-button login-submit" disabled={loading}>
+              {loading ? "Authenticating..." : `Sign in as ${loginMode === "admin" ? "Super Admin" : "Staff"}`}
+            </button>
+          </form>
+
+          <div className="login-quick-demo">
+            <span>QUICK DEMO ACCESSS</span>
+            <div className="quick-buttons">
+              <button
+                type="button"
+                className="quick-btn admin-quick"
+                onClick={() => handleQuickLogin("superadmin", "admin123", "admin")}
+              >
+                <ShieldCheck size={14} /> Super Admin Demo
+              </button>
+              <button
+                type="button"
+                className="quick-btn staff-quick"
+                onClick={() => handleQuickLogin("mohammed", "staff123", "staff")}
+              >
+                <Users size={14} /> Staff Demo (Mohammed)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="login-footer">
+          <small>Al Kanz Upholstery Workshop · Dubai, UAE</small>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
+  const [currentUser, setCurrentUser] = useState(() => safeParse(localStorage.getItem("al-kanz-session"), null));
+
+  const handleLogin = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem("al-kanz-session", JSON.stringify(user));
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem("al-kanz-session");
+  };
+
   const [page, setPage] = useState("Dashboard");
   const [jobs, setJobs] = useState(() => loadLocalData().jobs || INITIAL_JOBS);
   const [customers, setCustomers] = useState(() => loadLocalData().customers || INITIAL_CUSTOMERS);
@@ -743,6 +988,13 @@ const netCash = totalPaid - totalExpenses;
   };
 
   const navigate = (name) => {
+    const restrictedForStaff = ["Accounts", "Ledger", "Expenses", "Move Money", "Reports", "Audit & Security"];
+    if (currentUser && !currentUser.isSuperAdmin && restrictedForStaff.includes(name)) {
+      alert("Access Denied: Super Admin permissions required to access financial & security modules.");
+      setPage("Dashboard");
+      return;
+    }
+
     setPage(name);
     setSidebarOpen(false);
 
@@ -966,6 +1218,38 @@ const netCash = totalPaid - totalExpenses;
     return results;
   }, [search, jobs, customers, quotations, transactions]);
 
+  if (!currentUser) {
+    return (
+      <div className={`app theme-${theme} ${theme === "night" ? "theme-dark" : ""}`} data-theme={theme}>
+        <LoginPage onLogin={handleLogin} staffList={staff} />
+      </div>
+    );
+  }
+
+  const displayedNav = NAVIGATION.map((group) => {
+    if (currentUser?.isSuperAdmin) return group;
+    if (group.section === "FINANCE") return null;
+    if (group.section === "SYSTEM") {
+      return {
+        ...group,
+        items: group.items.map((item) => (item.name === "Settings" ? { ...item, children: ["User"] } : item)),
+      };
+    }
+    return group;
+  }).filter(Boolean);
+
+  const displayedQuickNav = QUICK_NAV.filter(({ name }) => {
+    if (currentUser?.isSuperAdmin) return true;
+    return !["Reports", "Accounts", "Ledger", "Expenses", "Settings"].includes(name);
+  });
+
+  const userInitials = String(currentUser.name || "AK")
+    .split(" ")
+    .map((x) => x[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <>
       <style>{FINAL_CSS}</style>
@@ -1006,7 +1290,7 @@ const netCash = totalPaid - totalExpenses;
           </div>
 
           <div className="nav-scroll">
-            {NAVIGATION.map((group) => (
+            {displayedNav.map((group) => (
               <div className="nav-group" key={group.section}>
                 <div className="nav-section-title">
                   {group.section}
@@ -1231,10 +1515,10 @@ const netCash = totalPaid - totalExpenses;
                   aria-expanded={adminMenuOpen}
                   aria-label="Open Admin menu"
                 >
-                  <div>AK</div>
+                  <div>{userInitials}</div>
                   <section>
-                    <strong>Admin</strong>
-                    <span>Owner</span>
+                    <strong>{currentUser.name}</strong>
+                    <span>{currentUser.role || (currentUser.isSuperAdmin ? "Super Admin" : "Staff")}</span>
                   </section>
                   <ChevronDown
                     size={14}
@@ -1252,24 +1536,30 @@ const netCash = totalPaid - totalExpenses;
                       }}
                     >
                       <UserCog size={15} />
-                      <span>My Profile</span>
+                      <span>My Profile ({currentUser.username ? `@${currentUser.username}` : "User"})</span>
                     </button>
+                    {currentUser.isSuperAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAdminMenuOpen(false);
+                          navigate("Settings");
+                        }}
+                      >
+                        <Settings size={15} />
+                        <span>Settings</span>
+                      </button>
+                    )}
                     <button
                       type="button"
+                      style={{ color: "var(--danger, #d85858)" }}
                       onClick={() => {
                         setAdminMenuOpen(false);
-                        navigate("Settings");
+                        handleLogout();
                       }}
                     >
-                      <Settings size={15} />
-                      <span>Settings</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAdminMenuOpen(false)}
-                    >
-                      <X size={15} />
-                      <span>Close</span>
+                      <LogOut size={15} />
+                      <span>Log Out</span>
                     </button>
                   </div>
                 )}
@@ -1280,7 +1570,7 @@ const netCash = totalPaid - totalExpenses;
           <nav className="quick-nav" aria-label="Quick navigation">
             <div className="quick-nav-inner">
               <span className="quick-nav-label">QUICK NAV</span>
-              {QUICK_NAV.map(({ name, icon: Icon }) => (
+              {displayedQuickNav.map(({ name, icon: Icon }) => (
                 <button
                   type="button"
                   key={name}
@@ -2419,7 +2709,7 @@ function StaffPage({ staff = [], setStaff, setModal, setEntityPreview, onEdit })
   const avgAttendance = safeStaff.length ? Math.round(safeStaff.reduce((sum,p)=>sum+Number(p.attendance||0),0)/safeStaff.length) : 0;
   return (
     <>
-      <PageTitle eyebrow="TEAM · PAYROLL" title="Staff" subtitle="Manage employees, salaries, attendance and workshop performance." button="Add Staff" onClick={()=>setModal("staff")} />
+      <PageTitle eyebrow="TEAM · PAYROLL & CREDENTIALS" title="Staff & Credentials" subtitle="Manage employees, login credentials, salaries, attendance and performance." button="Add Staff" onClick={()=>setModal("staff")} />
       <div className="staff-summary-grid">
         <ReportBox icon={Users} title="Total staff" value={safeStaff.length} note={`${active} active members`} />
         <ReportBox icon={CircleDollarSign} title="Monthly payroll" value={money(payroll)} note="Monthly salary records" />
@@ -2430,12 +2720,38 @@ function StaffPage({ staff = [], setStaff, setModal, setEntityPreview, onEdit })
         {safeStaff.map((person)=>{
           const initials=String(person.name||"S").split(" ").map(x=>x[0]).join("").slice(0,2).toUpperCase();
           return <div className="staff-card staff-card-rich" key={person.id}>
-            <div className="staff-card-top"><div className="staff-avatar">{initials}</div><span className={person.status === "Active" ? "staff-active" : "staff-leave"}>{person.status}</span></div>
-            <h3>{person.name}</h3><p>{person.role}</p>
-            <div className="staff-contact-lines"><span><Phone size={13}/>{person.phone||"No phone"}</span><span><Mail size={13}/>{person.email||"No email"}</span></div>
-            <div className="staff-salary-box"><div><small>SALARY</small><strong>{money(person.salary)}</strong></div><span>{person.salaryPeriod}</span></div>
-            <div className="staff-metrics"><div><small>ATTENDANCE</small><strong>{Number(person.attendance||0)}%</strong></div><div><small>PERFORMANCE</small><strong>{Number(person.performance||0)}%</strong></div></div>
-            <div className="customer-card-actions"><button type="button" className="secondary-button" onClick={()=>setEntityPreview?.({type:"Staff",...person})}><Eye size={15}/> View profile</button><button type="button" className="primary-button" onClick={()=>onEdit?.(person)}><Edit3 size={15}/> Edit</button></div>
+            <div className="staff-card-top">
+              <div className="staff-avatar">{initials}</div>
+              <div className="staff-card-badges">
+                {person.isSuperAdmin && <span className="badge-superadmin"><ShieldCheck size={11} /> Admin</span>}
+                <span className={person.status === "Active" ? "staff-active" : "staff-leave"}>{person.status}</span>
+              </div>
+            </div>
+            <h3>{person.name}</h3>
+            <p>{person.role}</p>
+
+            {person.username && (
+              <div className="staff-login-info">
+                <UserCog size={13} /> <span>ID: <strong>@{person.username}</strong></span>
+              </div>
+            )}
+
+            <div className="staff-contact-lines">
+              <span><Phone size={13}/>{person.phone||"No phone"}</span>
+              <span><Mail size={13}/>{person.email||"No email"}</span>
+            </div>
+            <div className="staff-salary-box">
+              <div><small>SALARY</small><strong>{money(person.salary)}</strong></div>
+              <span>{person.salaryPeriod}</span>
+            </div>
+            <div className="staff-metrics">
+              <div><small>ATTENDANCE</small><strong>{Number(person.attendance||0)}%</strong></div>
+              <div><small>PERFORMANCE</small><strong>{Number(person.performance||0)}%</strong></div>
+            </div>
+            <div className="customer-card-actions">
+              <button type="button" className="secondary-button" onClick={()=>setEntityPreview?.({type:"Staff",...person})}><Eye size={15}/> Profile</button>
+              <button type="button" className="primary-button" onClick={()=>onEdit?.(person)}><Edit3 size={15}/> Credentials</button>
+            </div>
           </div>;
         })}
         {!safeStaff.length && <EmptyState icon={UserRound} title="No staff members" text="Add your first workshop employee." />}
@@ -3969,14 +4285,127 @@ function SupplierModal({ close, save, initial }) {
 ============================================================ */
 
 function StaffModal({ close, save, initial }) {
-  const [form,setForm]=useState(initial || {name:"",role:"Upholsterer",phone:"",email:"",address:"",emergencyContact:"",joiningDate:new Date().toISOString().slice(0,10),bank:"",iban:"",salary:"",salaryPeriod:"Monthly",attendance:"100",performance:"100",status:"Active",notes:""});
-  const update=(k,v)=>setForm(f=>({...f,[k]:v}));
-  const submit=(e)=>{e.preventDefault();if(!form.name.trim())return alert("Staff name is required.");save({...form,name:form.name.trim(),salary:Number(form.salary||0),attendance:Number(form.attendance||0),performance:Number(form.performance||0)});};
-  return <Modal title={initial ? "Edit Staff" : "Add Staff"} subtitle="Create a complete employee profile with payroll and performance information." close={close}><form onSubmit={submit}>
-    <div className="form-section-label"><span>PERSONAL & CONTACT</span><small>Employee information</small></div><div className="modal-grid"><Field label="Staff name *" value={form.name} onChange={v=>update("name",v)} placeholder="Full name"/><SelectField label="Role" value={form.role} onChange={v=>update("role",v)} options={["Upholsterer","Master Upholsterer","Leather Technician","Stitching Specialist","Foam Technician","Helper","Driver","Manager"]}/><Field label="Phone" value={form.phone} onChange={v=>update("phone",v)} placeholder="+971 50 000 0000"/><Field label="Email" value={form.email} onChange={v=>update("email",v)} placeholder="staff@email.com"/><Field label="Address" value={form.address} onChange={v=>update("address",v)} placeholder="Dubai, UAE"/><Field label="Emergency contact" value={form.emergencyContact} onChange={v=>update("emergencyContact",v)} placeholder="Name · phone"/></div>
-    <div className="form-section-label"><span>PAYROLL</span><small>Salary and bank details</small></div><div className="modal-grid"><Field label="Salary" type="number" value={form.salary} onChange={v=>update("salary",v)} placeholder="AED 0"/><SelectField label="Salary period" value={form.salaryPeriod} onChange={v=>update("salaryPeriod",v)} options={["Monthly","Weekly","Daily","Hourly"]}/><Field label="Joining date" type="date" value={form.joiningDate} onChange={v=>update("joiningDate",v)}/><Field label="Bank" value={form.bank} onChange={v=>update("bank",v)} placeholder="Bank name"/><Field label="IBAN" value={form.iban} onChange={v=>update("iban",v)} placeholder="AE..."/><SelectField label="Status" value={form.status} onChange={v=>update("status",v)} options={["Active","On Leave","Inactive"]}/></div>
-    <div className="form-section-label"><span>PERFORMANCE</span><small>Track attendance and quality</small></div><div className="modal-grid"><Field label="Attendance %" type="number" value={form.attendance} onChange={v=>update("attendance",v)} placeholder="100"/><Field label="Performance %" type="number" value={form.performance} onChange={v=>update("performance",v)} placeholder="100"/></div><label className="field"><span>Staff notes</span><textarea rows="3" value={form.notes} onChange={e=>update("notes",e.target.value)} placeholder="Skills, responsibilities, salary notes, remarks..."/></label>
-    <div className="modal-footer"><button type="button" className="secondary-button" onClick={close}>Cancel</button><button type="submit" className="primary-button"><Save size={16}/> {initial ? "Update Staff" : "Save Staff"}</button></div></form></Modal>;
+  const [form, setForm] = useState(
+    initial || {
+      name: "",
+      role: "Upholsterer",
+      username: "",
+      password: "",
+      isSuperAdmin: false,
+      phone: "",
+      email: "",
+      address: "",
+      emergencyContact: "",
+      joiningDate: new Date().toISOString().slice(0, 10),
+      bank: "",
+      iban: "",
+      salary: "",
+      salaryPeriod: "Monthly",
+      attendance: "100",
+      performance: "100",
+      status: "Active",
+      notes: "",
+    }
+  );
+  const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const generateUsername = () => {
+    if (!form.name.trim()) return alert("Enter staff name first.");
+    const cleanName = form.name.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+    update("username", cleanName);
+  };
+
+  const generatePassword = () => {
+    const chars = "abcdefghjkmnpqrstuvwxyz23456789";
+    let pass = "";
+    for (let i = 0; i < 8; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    update("password", pass);
+  };
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!form.name.trim()) return alert("Staff name is required.");
+    save({
+      ...form,
+      name: form.name.trim(),
+      username: form.username ? form.username.trim() : form.name.trim().toLowerCase().replace(/[^a-z0-9]/g, ""),
+      password: form.password || "staff123",
+      salary: Number(form.salary || 0),
+      attendance: Number(form.attendance || 0),
+      performance: Number(form.performance || 0),
+    });
+  };
+
+  return (
+    <Modal
+      title={initial ? "Edit Staff & Credentials" : "Add Staff & Credentials"}
+      subtitle="Manage employee profile, login credentials, system permissions, and payroll."
+      close={close}
+    >
+      <form onSubmit={submit}>
+        <div className="form-section-label">
+          <span>PERSONAL & CONTACT</span>
+          <small>Employee information</small>
+        </div>
+        <div className="modal-grid">
+          <Field label="Staff name *" value={form.name} onChange={(v) => update("name", v)} placeholder="Full name" />
+          <SelectField label="Role" value={form.role} onChange={(v) => update("role", v)} options={["Upholsterer", "Master Upholsterer", "Leather Technician", "Stitching Specialist", "Foam Technician", "Helper", "Driver", "Manager", "Super Admin"]} />
+          <Field label="Phone" value={form.phone} onChange={(v) => update("phone", v)} placeholder="+971 50 000 0000" />
+          <Field label="Email" value={form.email} onChange={(v) => update("email", v)} placeholder="staff@email.com" />
+          <Field label="Address" value={form.address} onChange={(v) => update("address", v)} placeholder="Dubai, UAE" />
+          <Field label="Emergency contact" value={form.emergencyContact} onChange={(v) => update("emergencyContact", v)} placeholder="Name · phone" />
+        </div>
+
+        <div className="form-section-label">
+          <span>LOGIN & SYSTEM CREDENTIALS</span>
+          <small>Set credentials for staff system login</small>
+        </div>
+        <div className="modal-grid">
+          <div className="field-with-btn">
+            <Field label="Login Username / ID" value={form.username || ""} onChange={(v) => update("username", v)} placeholder="e.g. mohammed" />
+            <button type="button" className="field-action-btn" onClick={generateUsername}>Auto</button>
+          </div>
+          <div className="field-with-btn">
+            <Field label="Login Password" value={form.password || ""} onChange={(v) => update("password", v)} placeholder="Set password" />
+            <button type="button" className="field-action-btn" onClick={generatePassword}>Generate</button>
+          </div>
+          <SelectField label="System Role" value={form.isSuperAdmin ? "Super Admin" : "Staff Member"} onChange={(v) => update("isSuperAdmin", v === "Super Admin")} options={["Staff Member", "Super Admin"]} />
+          <SelectField label="Account Status" value={form.status} onChange={(v) => update("status", v)} options={["Active", "On Leave", "Inactive", "Disabled"]} />
+        </div>
+
+        <div className="form-section-label">
+          <span>PAYROLL</span>
+          <small>Salary and bank details</small>
+        </div>
+        <div className="modal-grid">
+          <Field label="Salary" type="number" value={form.salary} onChange={(v) => update("salary", v)} placeholder="AED 0" />
+          <SelectField label="Salary period" value={form.salaryPeriod} onChange={(v) => update("salaryPeriod", v)} options={["Monthly", "Weekly", "Daily", "Hourly"]} />
+          <Field label="Joining date" type="date" value={form.joiningDate} onChange={(v) => update("joiningDate", v)} />
+          <Field label="Bank" value={form.bank} onChange={(v) => update("bank", v)} placeholder="Bank name" />
+          <Field label="IBAN" value={form.iban} onChange={(v) => update("iban", v)} placeholder="AE..." />
+        </div>
+
+        <div className="form-section-label">
+          <span>PERFORMANCE</span>
+          <small>Track attendance and quality</small>
+        </div>
+        <div className="modal-grid">
+          <Field label="Attendance %" type="number" value={form.attendance} onChange={(v) => update("attendance", v)} placeholder="100" />
+          <Field label="Performance %" type="number" value={form.performance} onChange={(v) => update("performance", v)} placeholder="100" />
+        </div>
+
+        <label className="field">
+          <span>Staff notes</span>
+          <textarea rows="3" value={form.notes} onChange={(e) => update("notes", e.target.value)} placeholder="Skills, responsibilities, credentials remarks..." />
+        </label>
+
+        <div className="modal-footer">
+          <button type="button" className="secondary-button" onClick={close}>Cancel</button>
+          <button type="submit" className="primary-button"><Save size={16} /> {initial ? "Update Staff" : "Save Staff"}</button>
+        </div>
+      </form>
+    </Modal>
+  );
 }
 
 /* ============================================================

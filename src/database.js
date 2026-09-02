@@ -427,6 +427,9 @@ export const staffDB = {
       role: staff.role || "",
       phone: staff.phone || "",
       status: staff.status || "Active",
+      username: staff.username || "",
+      password: staff.password || "",
+      is_superadmin: staff.is_superadmin ? "true" : "false",
     });
   },
 
@@ -436,6 +439,9 @@ export const staffDB = {
       role: staff.role || "",
       phone: staff.phone || "",
       status: staff.status || "Active",
+      username: staff.username || "",
+      password: staff.password || "",
+      is_superadmin: staff.is_superadmin ? "true" : "false",
     });
   },
 

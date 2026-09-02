@@ -95,6 +95,9 @@ const tables = {
     ["role", "string", false, 100],
     ["phone", "string", false, 30],
     ["status", "string", false, 50],
+    ["username", "string", false, 50],
+    ["password", "string", false, 100],
+    ["is_superadmin", "string", false, 10],
   ],
 
   audit_logs: [
