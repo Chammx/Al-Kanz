@@ -1595,7 +1595,7 @@ function Dashboard({
           <div className="dashboard-action-list">
             <QuickAction icon={ReceiptText} title="Create Bill" subtitle="Bill a particular upholstery item" onClick={() => navigate("Billing")} />
             <QuickAction icon={Plus} title="New Job" subtitle="Add a customer upholstery job" onClick={() => setModal("job")} />
-            <QuickAction icon={Users} title="Add Customer" subtitle="Save a new customer profile" onClick={() => setModal("customer")} />
+            <QuickAction icon={Users} title={initial ? "Edit Customer" : "Add Customer"} subtitle="Save a new customer profile" onClick={() => setModal("customer")} />
             <QuickAction icon={Package} title="Add Material" subtitle="Update workshop inventory" onClick={() => setModal("material")} />
           </div>
           <div className="action-link-row">
