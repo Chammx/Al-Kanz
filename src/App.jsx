@@ -543,6 +543,125 @@ const money = (value) =>
 
 const LOCAL_KEY = "al-kanz-uae-data-v2";
 
+/* ============================================================
+   CUSTOMER DOCUMENT EXPORT
+   Renders the actual on-screen bill/quotation template into PDF.
+   WhatsApp cannot receive a file through wa.me directly; when the
+   browser supports Web Share with files, the PDF is handed to the
+   native share sheet so WhatsApp can send the real PDF attachment.
+============================================================ */
+async function createCustomerDocumentPdf(element, filename) {
+  if (!element) throw new Error("Document template is not open.");
+  const { default: html2canvas } = await import("html2canvas");
+  const { jsPDF } = await import("jspdf");
+
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    allowTaint: false,
+    backgroundColor: "#ffffff",
+    logging: false,
+    imageTimeout: 15000,
+    windowWidth: Math.max(document.documentElement.clientWidth, element.scrollWidth),
+  });
+
+  const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const pageWidth = 210;
+  const pageHeight = 297;
+  const margin = 8;
+  const printableWidth = pageWidth - margin * 2;
+  const printableHeight = pageHeight - margin * 2;
+  const pxPerMm = canvas.width / printableWidth;
+  const sliceHeightPx = Math.floor(printableHeight * pxPerMm);
+
+  let offsetY = 0;
+  let pageIndex = 0;
+
+  while (offsetY < canvas.height) {
+    const sliceHeight = Math.min(sliceHeightPx, canvas.height - offsetY);
+    const slice = document.createElement("canvas");
+    slice.width = canvas.width;
+    slice.height = sliceHeight;
+    const ctx = slice.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, slice.width, slice.height);
+    ctx.drawImage(
+      canvas,
+      0,
+      offsetY,
+      canvas.width,
+      sliceHeight,
+      0,
+      0,
+      canvas.width,
+      sliceHeight
+    );
+
+    const imgHeight = slice.height / pxPerMm;
+    if (pageIndex > 0) pdf.addPage();
+    pdf.addImage(slice.toDataURL("image/jpeg", 0.96), "JPEG", margin, margin, printableWidth, imgHeight, undefined, "FAST");
+
+    offsetY += sliceHeight;
+    pageIndex += 1;
+  }
+
+  return new File([pdf.output("blob")], filename, { type: "application/pdf" });
+}
+
+async function shareCustomerDocumentPdf({ element, filename, title, message, fallbackMessage }) {
+  const file = await createCustomerDocumentPdf(element, filename);
+  const canFileShare = !!navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }));
+  if (canFileShare) {
+    await navigator.share({ title, text: message, files: [file] });
+    return true;
+  }
+  const url = URL.createObjectURL(file);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 15000);
+  if (fallbackMessage) alert(fallbackMessage);
+  return false;
+}
+
+function revealPrintBillForCapture() {
+  const sheet = document.querySelector(".print-invoice-sheet");
+  const paper = sheet?.querySelector(".invoice-paper-screen");
+  if (!sheet || !paper) return { element: null, cleanup: () => {} };
+  const previous = {
+    display: sheet.style.display,
+    position: sheet.style.position,
+    left: sheet.style.left,
+    top: sheet.style.top,
+    width: sheet.style.width,
+    zIndex: sheet.style.zIndex,
+    visibility: sheet.style.visibility,
+  };
+  sheet.style.display = "block";
+  sheet.style.position = "fixed";
+  sheet.style.left = "-10000px";
+  sheet.style.top = "0";
+  sheet.style.width = "900px";
+  sheet.style.zIndex = "-1";
+  sheet.style.visibility = "visible";
+  return {
+    element: paper,
+    cleanup: () => {
+      sheet.style.display = previous.display;
+      sheet.style.position = previous.position;
+      sheet.style.left = previous.left;
+      sheet.style.top = previous.top;
+      sheet.style.width = previous.width;
+      sheet.style.zIndex = previous.zIndex;
+      sheet.style.visibility = previous.visibility;
+    },
+  };
+}
+
+
 const safeParse = (value, fallback) => {
   try { return value ? JSON.parse(value) : fallback; }
   catch { return fallback; }
@@ -3324,8 +3443,22 @@ function BillingPage({
         }, 250);
       }
     } catch (error) {
-      console.error("Invoice creation failed", error);
-      alert(`Bill was not saved: ${error?.message || "database error"}`);
+      // Cloud/Appwrite failure must never discard a bill that was already built.
+      // Keep the bill locally so the user can continue working and retry cloud sync later.
+      console.error("Invoice cloud sync failed; keeping bill locally:", error);
+      setJobs?.((items) => editingBill
+        ? (Array.isArray(items) ? items.map(item => String(item.id || item.jobId || item.invoice_id) === String(editingBill.jobId || editingBill.id) ? { ...item, ...bill } : item) : [bill])
+        : [bill, ...(Array.isArray(items) ? items : [])]);
+      if (!editingBill && paidNow > 0) {
+        setPayments?.((items) => [{ id: `PAY-${Date.now()}`, bill_id: bill.id, job_id: bill.id, customer: bill.customer, amount: paidNow, payment_method: bill.paymentMethod, paid_at: bill.date }, ...(Array.isArray(items) ? items : [])]);
+        setTransactions?.((items) => [{ id: `TX-${Date.now()}`, transaction_type: "Income", description: `Invoice · ${bill.customer} · ${bill.id}`, amount: paidNow, account: bill.paymentMethod, transaction_date: bill.date }, ...(Array.isArray(items) ? items : [])]);
+      }
+      setShowBillBuilder(false);
+      setEditingBill(null);
+      setSelected(bill);
+      setPostPrintBill(bill);
+      resetBillForm();
+      alert(`Bill ${bill.id} saved on this device. Cloud sync failed, so it will be kept locally.`);
     } finally {
       setSaving(false);
     }
@@ -3354,39 +3487,58 @@ function BillingPage({
       window.location.href = `mailto:${bill.email}?subject=${encodeURIComponent(`Al Kanz Invoice ${bill.id}`)}&body=${encodeURIComponent(message)}`;
       return;
     }
+
+    const getBillElement = () => {
+      const visible = document.querySelector(".invoice-detail-modal .invoice-paper-screen");
+      if (visible) return { element: visible, cleanup: () => {} };
+      return revealPrintBillForCapture();
+    };
+
     if (channel === "whatsapp") {
       const phone = String(bill.whatsapp || bill.phone || "").replace(/\D/g, "");
       if (!phone) return alert("No WhatsApp number saved.");
-      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+      const target = getBillElement();
+      if (!target.element) return alert("Open the invoice once before sending it to WhatsApp.");
+      try {
+        const shared = await shareCustomerDocumentPdf({
+          element: target.element,
+          filename: `${bill.id}.pdf`,
+          title: `Al Kanz Invoice ${bill.id}`,
+          message: `Invoice ${bill.id} · ${bill.customer || "Customer"} · ${money(bill.total)}`,
+          fallbackMessage: "The bill PDF was downloaded. This browser cannot attach files directly to WhatsApp Web, so open WhatsApp and attach the downloaded PDF to the customer chat.",
+        });
+        if (!shared) window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+      } catch (error) {
+        console.error("WhatsApp bill sharing failed", error);
+        alert(`Could not prepare the bill PDF: ${error?.message || "unknown error"}`);
+      } finally {
+        target.cleanup();
+      }
       return;
     }
+
     if (channel === "copy") {
       await navigator.clipboard?.writeText(message);
       alert("Invoice summary copied.");
       return;
     }
+
     if (channel === "share") {
-      const { jsPDF } = await import("jspdf");
-      const doc = new jsPDF({ unit: "mm", format: "a4" });
-      doc.setFontSize(18);
-      doc.text("AL KANZ UPHOLSTERY", 20, 22);
-      doc.setFontSize(10);
-      doc.text(`TAX INVOICE · ${bill.id}`, 20, 30);
-      doc.text(`Customer: ${bill.customer}`, 20, 40);
-      let y = 55;
-      (bill.items || []).forEach((item) => { doc.text(`${item.item} | ${item.quantity} × ${money(item.unitPrice)} = ${money(item.amount)}`, 20, y); y += 7; });
-      y += 8;
-      doc.text(`Subtotal: ${money(bill.subtotal)}`, 130, y); y += 7;
-      doc.text(`VAT: ${money(bill.vat)}`, 130, y); y += 7;
-      doc.text(`TOTAL: ${money(bill.total)}`, 130, y); y += 7;
-      doc.text(`Balance: ${money(bill.balance)}`, 130, y);
-      const blob = doc.output("blob");
-      const file = new File([blob], `${bill.id}.pdf`, { type: "application/pdf" });
-      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-        await navigator.share({ title: `Al Kanz Invoice ${bill.id}`, text: `${bill.customer} · ${money(bill.total)}`, files: [file] });
-      } else {
-        doc.save(`${bill.id}.pdf`);
-        alert("This browser cannot share a PDF file directly. The PDF was saved instead.");
+      const target = getBillElement();
+      if (!target.element) return alert("Open the invoice once before sharing the PDF.");
+      try {
+        await shareCustomerDocumentPdf({
+          element: target.element,
+          filename: `${bill.id}.pdf`,
+          title: `Al Kanz Invoice ${bill.id}`,
+          message: `${bill.customer || "Customer"} · ${money(bill.total)}`,
+          fallbackMessage: "The customer-facing bill PDF was downloaded because this browser does not support file sharing.",
+        });
+      } catch (error) {
+        console.error("Invoice PDF sharing failed", error);
+        alert(`Could not create the bill PDF: ${error?.message || "unknown error"}`);
+      } finally {
+        target.cleanup();
       }
     }
   };
@@ -3882,6 +4034,7 @@ function QuotationPage({ page, quotations = [], setQuotations, customers = [], m
       `Validity: ${q.validity || "30 days"}`,
       "Thank you for choosing Al Kanz Upholstery.",
     ].join("\n");
+
     if (channel === "phone") {
       if (!q.phone) return alert("No phone number saved.");
       window.location.href = `tel:${q.phone}`;
@@ -3892,24 +4045,42 @@ function QuotationPage({ page, quotations = [], setQuotations, customers = [], m
       window.location.href = `mailto:${q.email}?subject=${encodeURIComponent(`Al Kanz Quotation ${q.id}`)}&body=${encodeURIComponent(message)}`;
       return;
     }
+
+    const element = document.querySelector(".quotation-modal-document .invoice-document");
+    if (!element) return alert("Open the quotation receipt before sharing it.");
+
     if (channel === "whatsapp") {
       const phone = String(q.whatsapp || q.phone || "").replace(/\D/g, "");
       if (!phone) return alert("No WhatsApp number saved.");
-      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+      try {
+        const shared = await shareCustomerDocumentPdf({
+          element,
+          filename: `${q.id}.pdf`,
+          title: `Al Kanz Quotation ${q.id}`,
+          message: `Quotation ${q.id} · ${q.customer || "Customer"} · ${money(q.amount)}`,
+          fallbackMessage: "The quotation PDF was downloaded. This browser cannot attach files directly to WhatsApp Web, so open WhatsApp and attach the downloaded PDF to the customer chat.",
+        });
+        if (!shared) window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+      } catch (error) {
+        console.error("WhatsApp quotation sharing failed", error);
+        alert(`Could not prepare the quotation PDF: ${error?.message || "unknown error"}`);
+      }
       return;
     }
+
     if (channel === "share") {
-      const { jsPDF } = await import("jspdf");
-      const doc = new jsPDF({unit:"mm",format:"a4"});
-      doc.setFontSize(18); doc.text("AL KANZ UPHOLSTERY",20,22);
-      doc.setFontSize(11); doc.text(`QUOTATION · ${q.id}`,20,30);
-      doc.setFontSize(10); doc.text(`Customer: ${q.customer}`,20,40);
-      let y=52;
-      (q.items||[]).forEach(item=>{ doc.text(`${item.item} | ${item.quantity} × ${money(item.unitPrice)} = ${money(item.amount ?? Number(item.quantity||0)*Number(item.unitPrice||0))}`,20,y); y+=7; if(y>270){doc.addPage();y=20;} });
-      y=Math.min(y+8,275); doc.text(`Subtotal: ${money(q.subtotal)}`,130,y); y+=7; doc.text(`VAT: ${money(q.vat)}`,130,y); y+=7; doc.text(`TOTAL: ${money(q.amount)}`,130,y);
-      const blob=doc.output("blob"); const file=new File([blob],`${q.id}.pdf`,{type:"application/pdf"});
-      if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))) await navigator.share({title:`Al Kanz Quotation ${q.id}`,text:`${q.customer} · ${money(q.amount)}`,files:[file]});
-      else { doc.save(`${q.id}.pdf`); alert("This browser cannot share a PDF directly. The quotation PDF was saved instead."); }
+      try {
+        await shareCustomerDocumentPdf({
+          element,
+          filename: `${q.id}.pdf`,
+          title: `Al Kanz Quotation ${q.id}`,
+          message: `${q.customer || "Customer"} · ${money(q.amount)}`,
+          fallbackMessage: "The customer-facing quotation PDF was downloaded because this browser does not support file sharing.",
+        });
+      } catch (error) {
+        console.error("Quotation PDF sharing failed", error);
+        alert(`Could not create the quotation PDF: ${error?.message || "unknown error"}`);
+      }
     }
   };
 
