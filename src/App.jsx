@@ -728,7 +728,242 @@ function LoginScreen({ onLogin }) {
         .ak-login-role small{display:block;margin-top:4px;font-size:10px;font-weight:600;color:inherit;opacity:.7}
         @keyframes akCompanyIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
         @media(max-width:560px){.ak-login-company h1{font-size:24px}.ak-login-card{padding:26px 20px}}
-      `}</style>
+      
+/* ============================================================
+   QUOTATION RECEIPT — CLEAN BILL-STYLE ALIGNMENT
+============================================================ */
+.quotation-modal-document {
+  position:relative;
+  width:min(1040px, calc(100vw - 48px));
+  max-width:1040px;
+  max-height:92vh;
+  overflow:auto;
+  margin:auto;
+  padding:30px;
+  box-sizing:border-box;
+  background:#fff !important;
+  color:#20201d !important;
+  border:1px solid #e2ddd3 !important;
+  border-radius:18px !important;
+}
+.quotation-modal-document .quotation-receipt-banner { margin-right:34px; }
+.quotation-modal-document .invoice-document-head {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:28px;
+  align-items:center;
+  padding:4px 0 20px;
+  border-bottom:1px solid #ded8ce;
+}
+.quotation-modal-document .invoice-document-head h2 {
+  margin:7px 0 4px;
+  font-size:28px !important;
+  line-height:1.1;
+  letter-spacing:.2px;
+  color:#241f19 !important;
+}
+.quotation-modal-document .invoice-document-head p {
+  margin:0;
+  color:#77736c !important;
+  font-size:12px;
+}
+.quotation-modal-document .document-number {
+  min-width:190px;
+  display:grid;
+  gap:5px;
+  justify-items:end;
+  text-align:right;
+}
+.quotation-modal-document .document-number strong {
+  display:inline-flex;
+  min-width:130px;
+  justify-content:center;
+  padding:9px 14px;
+  border:1px solid #d8c5a5;
+  border-radius:9px;
+  background:#fbf5e9;
+  color:#8a6125 !important;
+  font-size:16px;
+}
+.quotation-modal-document .document-number span { font-size:11px; color:#716d66 !important; }
+.quotation-modal-document .document-parties {
+  display:grid !important;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin:18px 0;
+}
+.quotation-modal-document .document-parties > div {
+  min-width:0;
+  padding:15px 16px;
+  border:1px solid #e2ddd3;
+  border-radius:12px;
+  background:#fcfaf6;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.quotation-modal-document .document-parties small {
+  font-size:8px !important;
+  font-weight:800;
+  letter-spacing:1.4px;
+  color:#a06d2d !important;
+}
+.quotation-modal-document .document-parties strong { font-size:14px !important; color:#28251f !important; }
+.quotation-modal-document .document-parties span { font-size:11px; color:#66625b !important; line-height:1.45; overflow-wrap:anywhere; }
+.quotation-modal-document .invoice-items {
+  border:1px solid #ded8ce;
+  border-radius:12px;
+  overflow:hidden;
+  background:#fff;
+}
+.quotation-modal-document .invoice-item-head,
+.quotation-modal-document .invoice-item-row {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 70px 130px 145px;
+  gap:12px;
+  align-items:center;
+}
+.quotation-modal-document .invoice-item-head {
+  min-height:40px;
+  padding:0 15px;
+  background:#f6f0e6;
+  border-bottom:1px solid #ded8ce;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:1px;
+  color:#81766a !important;
+}
+.quotation-modal-document .invoice-item-head span:not(:first-child) { text-align:right; }
+.quotation-modal-document .invoice-item-row {
+  min-height:58px;
+  padding:9px 15px;
+  border-bottom:1px solid #eee9e1;
+  font-size:11px;
+}
+.quotation-modal-document .invoice-item-row:last-child { border-bottom:0; }
+.quotation-modal-document .invoice-item-row > span:not(:first-child),
+.quotation-modal-document .invoice-item-row > strong { text-align:right; }
+.quotation-modal-document .invoice-item-row > span:first-child { min-width:0; }
+.quotation-modal-document .invoice-item-row > span:first-child strong,
+.quotation-modal-document .invoice-item-row > span:first-child small { display:block; }
+.quotation-modal-document .invoice-item-row > span:first-child strong { font-size:12px; color:#29251f !important; }
+.quotation-modal-document .invoice-item-row > span:first-child small { margin-top:3px; font-size:10px; color:#858078 !important; }
+.quotation-modal-document .invoice-item-row > strong { font-size:12px; color:#2b2924 !important; }
+.quotation-modal-document .document-totals {
+  width:min(390px,100%);
+  margin:18px 0 0 auto;
+  display:grid;
+  gap:8px;
+}
+.quotation-modal-document .document-totals > div {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:20px;
+  align-items:center;
+  font-size:12px;
+  color:#68635b !important;
+}
+.quotation-modal-document .document-totals > div strong { text-align:right; color:#292722 !important; }
+.quotation-modal-document .document-totals .grand {
+  margin-top:5px;
+  padding-top:12px;
+  border-top:2px solid #b8843b;
+  font-size:16px;
+  color:#8b5d21 !important;
+}
+.quotation-modal-document .document-totals .grand strong { font-size:18px; color:#8b5d21 !important; }
+.quotation-modal-document .quotation-receipt-contact {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin:18px 0;
+}
+.quotation-modal-document .quotation-receipt-contact > div {
+  min-width:0;
+  padding:11px 13px;
+  border:1px solid #e2ddd3;
+  border-radius:10px;
+  background:#fcfaf6;
+}
+.quotation-modal-document .quotation-receipt-contact small { font-size:7px; letter-spacing:1.2px; color:#938b80 !important; }
+.quotation-modal-document .quotation-receipt-contact strong { display:block; margin-top:4px; font-size:11px; color:#2b2925 !important; overflow-wrap:anywhere; }
+.quotation-modal-document .invoice-share-center {
+  margin-top:16px;
+  padding:16px;
+  border:1px solid #e2ddd3;
+  border-radius:12px;
+  background:#fbfaf7;
+}
+.quotation-modal-document .share-center-head { margin-bottom:12px; }
+.quotation-modal-document .share-center-head strong,
+.quotation-modal-document .share-center-head small { display:block; }
+.quotation-modal-document .share-center-head strong { margin-top:4px; font-size:13px; color:#292722 !important; }
+.quotation-modal-document .share-center-head small { margin-top:3px; font-size:10px; color:#7d776e !important; }
+.quotation-modal-document .post-print-actions {
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:9px;
+}
+.quotation-modal-document .post-print-actions .share-btn { min-width:0; justify-content:center; }
+.quotation-modal-document .document-actions {
+  display:flex !important;
+  align-items:center;
+  justify-content:flex-end;
+  gap:9px;
+  flex-wrap:wrap;
+  margin-top:16px;
+  padding-top:15px;
+  border-top:1px solid #e6e0d7;
+}
+.quotation-modal-document .document-actions .primary-button { margin-right:auto; }
+@media(max-width:800px){
+  .quotation-modal-document { width:calc(100vw - 24px); max-height:94vh; padding:20px; }
+  .quotation-modal-document .invoice-document-head { grid-template-columns:1fr; gap:14px; }
+  .quotation-modal-document .document-number { justify-items:start; text-align:left; }
+  .quotation-modal-document .document-parties { grid-template-columns:1fr; }
+  .quotation-modal-document .quotation-receipt-contact { grid-template-columns:1fr; }
+  .quotation-modal-document .post-print-actions { grid-template-columns:1fr 1fr; }
+  .quotation-modal-document .document-actions .primary-button { margin-right:0; }
+}
+@media(max-width:560px){
+  .quotation-modal-document { padding:15px; }
+  .quotation-modal-document .invoice-item-head { display:none !important; }
+  .quotation-modal-document .invoice-item-row {
+    grid-template-columns:1fr 1fr !important;
+    gap:7px 12px;
+  }
+  .quotation-modal-document .invoice-item-row > span:first-child { grid-column:1/-1; }
+  .quotation-modal-document .invoice-item-row > span:not(:first-child),
+  .quotation-modal-document .invoice-item-row > strong { text-align:left; }
+  .quotation-modal-document .post-print-actions { grid-template-columns:1fr; }
+  .quotation-modal-document .document-actions { justify-content:stretch; }
+  .quotation-modal-document .document-actions button { flex:1 1 45%; }
+}
+/* Night mode */
+.app.theme-night .quotation-modal-document { background:#17181b !important; color:#f2eee6 !important; border-color:#302f2d !important; }
+.app.theme-night .quotation-modal-document .invoice-document-head { border-color:#3a3834; }
+.app.theme-night .quotation-modal-document .invoice-document-head h2,
+.app.theme-night .quotation-modal-document .document-parties strong,
+.app.theme-night .quotation-modal-document .invoice-item-row > span:first-child strong,
+.app.theme-night .quotation-modal-document .invoice-item-row > strong,
+.app.theme-night .quotation-modal-document .document-totals > div strong,
+.app.theme-night .quotation-modal-document .share-center-head strong,
+.app.theme-night .quotation-modal-document .quotation-receipt-contact strong { color:#f2eee6 !important; }
+.app.theme-night .quotation-modal-document .invoice-document-head p,
+.app.theme-night .quotation-modal-document .document-number span,
+.app.theme-night .quotation-modal-document .document-parties span,
+.app.theme-night .quotation-modal-document .invoice-item-row > span:first-child small,
+.app.theme-night .quotation-modal-document .document-totals > div,
+.app.theme-night .quotation-modal-document .share-center-head small { color:#aaa49a !important; }
+.app.theme-night .quotation-modal-document .document-parties > div,
+.app.theme-night .quotation-modal-document .quotation-receipt-contact > div,
+.app.theme-night .quotation-modal-document .invoice-share-center { background:#202125 !important; border-color:#393834 !important; }
+.app.theme-night .quotation-modal-document .invoice-items { background:#17181b !important; border-color:#393834 !important; }
+.app.theme-night .quotation-modal-document .invoice-item-head { background:#242326 !important; border-color:#393834 !important; color:#aaa49a !important; }
+.app.theme-night .quotation-modal-document .invoice-item-row { border-color:#302f2d !important; }
+.app.theme-night .quotation-modal-document .document-actions { border-color:#393834 !important; }
+
+`}</style>
       <div className="ak-login-grid" />
       <div className="ak-login-orb a" />
       <div className="ak-login-orb b" />
