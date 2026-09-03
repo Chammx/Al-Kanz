@@ -894,6 +894,29 @@ function App() {
         setDbReady(true);
       } catch (error) {
         console.error("Al Kanz database load failed:", error);
+
+        // Keep the local application usable even when one remote table
+        // temporarily fails. Always expose the built-in AL KANZ product
+        // catalogue so products remain available in Materials/Billing.
+        const localProducts = PRODUCT_CATALOG.map(product => ({
+          ...product,
+          product: true,
+        }));
+
+        setMaterials(prev => {
+          const current = Array.isArray(prev) ? prev : [];
+          const existingNames = new Set(
+            current.map(x => String(x.name || "").trim().toLowerCase())
+          );
+
+          return [
+            ...localProducts.filter(
+              x => !existingNames.has(String(x.name).trim().toLowerCase())
+            ),
+            ...current,
+          ];
+        });
+
         setDbReady(false);
       } finally {
         setLoadingData(false);
