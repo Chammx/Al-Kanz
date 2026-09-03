@@ -1215,7 +1215,32 @@ const netCash = totalPaid - totalExpenses;
 
   return (
     <>
-      <style>{FINAL_CSS}</style>
+      <style>{FINAL_CSS + `
+/* ============================================================
+   BILLING + QUOTATION: UNLIMITED LINE ITEMS + RECEIPT COPY
+============================================================ */
+.line-editor-actions {
+  display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin:12px 0 4px;
+}
+.line-editor-actions > span { font-size:11px; color:var(--muted); margin-left:auto; }
+.add-line-button { min-height:38px; }
+.quotation-receipt-banner {
+  display:flex; flex-direction:column; gap:3px; margin:0 0 16px; padding:11px 13px;
+  border:1px solid #d9c19a; border-radius:12px; background:linear-gradient(135deg,#fffaf0,#f8efe0);
+}
+.quotation-receipt-banner span { font-size:8px; font-weight:900; letter-spacing:1.5px; color:#a06d2d; }
+.quotation-receipt-banner strong { font-size:14px; color:#2b302e; }
+.quotation-receipt-banner small { font-size:10px; color:#727a76; }
+.quotation-receipt-contact { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin:15px 0; }
+.quotation-receipt-contact > div { padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:var(--soft); }
+.quotation-receipt-contact small,.quotation-receipt-contact strong { display:block; }
+.quotation-receipt-contact small { font-size:7px; letter-spacing:1px; color:var(--muted); }
+.quotation-receipt-contact strong { margin-top:4px; font-size:10px; overflow-wrap:anywhere; }
+@media(max-width:700px){ .line-editor-actions > span { width:100%; margin-left:0; } .quotation-receipt-contact { grid-template-columns:1fr; } }
+.app.theme-night .quotation-receipt-banner { background:#221d15 !important; border-color:#57452d !important; }
+.app.theme-night .quotation-receipt-banner strong { color:#f1e9da !important; }
+.app.theme-night .quotation-receipt-banner small { color:#aaa399 !important; }
+`}</style>
 
       <div className={`app theme-${theme} ${theme === "night" ? "theme-dark" : ""} ${sidebarCollapsed ? "sidebar-collapsed" : ""}`} data-theme={theme}>
         {/* =====================================================
@@ -2820,6 +2845,20 @@ function BillingPage({
     setBillItems((items) => items.length <= 1 ? items : items.filter((_, itemIndex) => itemIndex !== index));
   };
 
+  const addBillItem = (count = 1) => {
+    setBillItems((items) => [
+      ...items,
+      ...Array.from({ length: Math.max(1, Number(count) || 1) }, (_, offset) => ({
+        id: `${Date.now()}-${items.length + offset}-${Math.random()}`,
+        materialId: "",
+        item: "",
+        description: "",
+        quantity: "1",
+        unitPrice: "",
+      })),
+    ]);
+  };
+
   const selectMaterial = (index, materialId) => {
     const material = safeMaterials.find((item) => String(item.id) === String(materialId));
     if (!material) {
@@ -3214,6 +3253,7 @@ function BillingPage({
                   <div className="bill-line-head"><span>#</span><span>Material / service</span><span>Description</span><span>Qty</span><span>Unit price</span><span>Amount</span><span></span></div>
                   {billItems.map((item,index)=><div className="bill-line-row" key={item.id}><span className="line-number">{String(index+1).padStart(2,"0")}</span><select value={item.materialId} onChange={e=>selectMaterial(index,e.target.value)}><option value="">Custom item</option>{safeMaterials.map(m=><option key={m.id} value={m.id}>{m.name} · {money(m.price)}</option>)}</select><input value={item.item} onChange={e=>updateItem(index,"item",e.target.value)} placeholder="Item / service"/><input value={item.description} onChange={e=>updateItem(index,"description",e.target.value)} placeholder="Description"/><input type="number" min="0.01" step="0.01" value={item.quantity} onChange={e=>updateItem(index,"quantity",e.target.value)} /><input type="number" min="0" step="0.01" value={item.unitPrice} onChange={e=>updateItem(index,"unitPrice",e.target.value)} placeholder="0.00"/><input value={money(itemTotals[index])} readOnly/><button type="button" className="icon-action danger-action" title="Remove item" onClick={()=>setBillItems(items=>items.length>1?items.filter((_,i)=>i!==index):items)}><Trash2 size={15}/></button></div>)}
                 </div>
+                <div className="line-editor-actions"><button type="button" className="secondary-button add-line-button" onClick={()=>addBillItem(1)}><Plus size={16}/> Add item</button><button type="button" className="secondary-button add-line-button" onClick={()=>addBillItem(5)}><Plus size={16}/> Add 5 items</button><span>Unlimited line items — add as many materials/services as this bill needs.</span></div>
                 <div className="bill-inline-grid finance-inline"><label className="field"><span>Discount (AED)</span><input type="number" min="0" value={billForm.discount} onChange={e=>setBillForm(f=>({...f,discount:e.target.value}))}/></label><label className="field"><span>VAT (%) — custom</span><input type="number" min="0" max="100" step="0.1" value={billForm.vat} onChange={e=>setBillForm(f=>({...f,vat:e.target.value}))}/></label><label className="field"><span>Paid now (AED)</span><input type="number" min="0" max={billTotal} value={billForm.paid} onChange={e=>setBillForm(f=>({...f,paid:e.target.value}))}/></label><label className="field"><span>Payment method</span><select value={billForm.paymentMethod} onChange={e=>setBillForm(f=>({...f,paymentMethod:e.target.value}))}><option>Cash</option><option>Card</option><option>Bank Transfer</option><option>Credit</option></select></label></div>
                 <div className="bill-form-actions"><button type="button" className="secondary-button" onClick={()=>{setShowBillBuilder(false);setEditingBill(null);}}><X size={16}/> Cancel</button><button type="button" className="secondary-button" disabled={saving} onClick={()=>createBill(false)}><Save size={16}/>{saving?"Saving…":editingBill?"Update Bill":"Save Bill"}</button><button type="button" className="primary-button" disabled={saving} onClick={()=>createBill(true)}><Printer size={16}/>{saving?"Saving…":editingBill?"Update & Print":"Save & Print"}</button></div>
               </div>
@@ -3558,6 +3598,12 @@ function QuotationPage({ page, quotations = [], setQuotations, customers = [], m
 
   const updateItem = (index,key,value) => setItems(prev => prev.map((item,i)=>i===index?{...item,[key]:value}:item));
   const removeItem = (index) => setItems(prev => prev.length > 1 ? prev.filter((_,i)=>i!==index) : prev);
+  const addQuotationItem = (count = 1) => setItems(prev => [
+    ...prev,
+    ...Array.from({length:Math.max(1,Number(count)||1)},(_,offset)=>({
+      id:`q-${Date.now()}-${prev.length+offset}-${Math.random()}`, materialId:"", item:"", description:"", quantity:"1", unitPrice:""
+    }))
+  ]);
 
   const reset = () => {
     setForm({customer:"",customerId:"",phone:"",whatsapp:"",address:"",validity:"30 days",discount:"0",vat:"5"});
@@ -3588,6 +3634,48 @@ function QuotationPage({ page, quotations = [], setQuotations, customers = [], m
     const sourceItems = Array.isArray(q.items)&&q.items.length ? q.items : [{item:q.item||"",description:q.description||"",quantity:q.quantity||1,unitPrice:q.unitPrice||0,materialId:q.materialId||""}];
     setItems(sourceItems.map((item,index)=>({id:`edit-${q.id}-${index}`,materialId:item.materialId||"",item:item.item||"",description:item.description||"",quantity:String(item.quantity||1),unitPrice:String(item.unitPrice||0)})));
     setCustomerSearch(q.customer||"");
+  };
+
+  const shareQuotation = async (q, channel) => {
+    const itemsText = (q.items || []).map((item,index) => `${index+1}. ${item.item} × ${item.quantity} = ${money(item.amount ?? Number(item.quantity||0)*Number(item.unitPrice||0))}`).join("\n");
+    const message = [
+      "AL KANZ UPHOLSTERY",
+      `Quotation: ${q.id}`,
+      `Customer: ${q.customer}`,
+      itemsText,
+      `Total: ${money(q.amount)}`,
+      `Validity: ${q.validity || "30 days"}`,
+      "Thank you for choosing Al Kanz Upholstery.",
+    ].join("\n");
+    if (channel === "phone") {
+      if (!q.phone) return alert("No phone number saved.");
+      window.location.href = `tel:${q.phone}`;
+      return;
+    }
+    if (channel === "email") {
+      if (!q.email) return alert("No email address is saved on this quotation.");
+      window.location.href = `mailto:${q.email}?subject=${encodeURIComponent(`Al Kanz Quotation ${q.id}`)}&body=${encodeURIComponent(message)}`;
+      return;
+    }
+    if (channel === "whatsapp") {
+      const phone = String(q.whatsapp || q.phone || "").replace(/\D/g, "");
+      if (!phone) return alert("No WhatsApp number saved.");
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (channel === "share") {
+      const { jsPDF } = await import("jspdf");
+      const doc = new jsPDF({unit:"mm",format:"a4"});
+      doc.setFontSize(18); doc.text("AL KANZ UPHOLSTERY",20,22);
+      doc.setFontSize(11); doc.text(`QUOTATION · ${q.id}`,20,30);
+      doc.setFontSize(10); doc.text(`Customer: ${q.customer}`,20,40);
+      let y=52;
+      (q.items||[]).forEach(item=>{ doc.text(`${item.item} | ${item.quantity} × ${money(item.unitPrice)} = ${money(item.amount ?? Number(item.quantity||0)*Number(item.unitPrice||0))}`,20,y); y+=7; if(y>270){doc.addPage();y=20;} });
+      y=Math.min(y+8,275); doc.text(`Subtotal: ${money(q.subtotal)}`,130,y); y+=7; doc.text(`VAT: ${money(q.vat)}`,130,y); y+=7; doc.text(`TOTAL: ${money(q.amount)}`,130,y);
+      const blob=doc.output("blob"); const file=new File([blob],`${q.id}.pdf`,{type:"application/pdf"});
+      if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))) await navigator.share({title:`Al Kanz Quotation ${q.id}`,text:`${q.customer} · ${money(q.amount)}`,files:[file]});
+      else { doc.save(`${q.id}.pdf`); alert("This browser cannot share a PDF directly. The quotation PDF was saved instead."); }
+    }
   };
 
   return <>
@@ -3623,6 +3711,7 @@ function QuotationPage({ page, quotations = [], setQuotations, customers = [], m
               <button type="button" className="icon-action danger-action" onClick={()=>removeItem(index)}><Trash2 size={15}/></button>
             </div>)}
           </div>
+          <div className="line-editor-actions"><button type="button" className="secondary-button add-line-button" onClick={()=>addQuotationItem(1)}><Plus size={16}/> Add item</button><button type="button" className="secondary-button add-line-button" onClick={()=>addQuotationItem(5)}><Plus size={16}/> Add 5 items</button><span>Unlimited line items — build the quotation with as many products/services as required.</span></div>
 
           <div className="bill-inline-grid finance-inline"><label className="field"><span>Discount (AED)</span><input type="number" min="0" value={form.discount} onChange={e=>setForm({...form,discount:e.target.value})}/></label><label className="field"><span>VAT (%)</span><input type="number" min="0" max="100" step="0.1" value={form.vat} onChange={e=>setForm({...form,vat:e.target.value})}/></label><label className="field"><span>Validity</span><select value={form.validity} onChange={e=>setForm({...form,validity:e.target.value})}><option>7 days</option><option>15 days</option><option>30 days</option><option>60 days</option></select></label></div>
           <div className="settings-form-actions full-field"><button type="button" className="primary-button" onClick={save}><Save size={16}/>{editingQuote?"Update Quotation":"Save Quotation"}</button><button type="button" className="secondary-button" onClick={()=>setPrintOpen(true)}><Printer size={16}/> Print Options</button><button type="button" className="secondary-button" onClick={()=>{reset();setShowForm(false);}}>Cancel</button></div>
@@ -3641,11 +3730,14 @@ function QuotationPage({ page, quotations = [], setQuotations, customers = [], m
     {!showForm && <div className="table-card"><div className="table-head"><span>QUOTE</span><span>CUSTOMER</span><span>ITEMS</span><span>AMOUNT</span><span>STATUS</span></div>{safeQuotations.length===0?<EmptyState icon={FileText} title="No quotations yet" text="Create your first quotation."/>:safeQuotations.map(q=><button type="button" className="table-row quotation-row-button" key={q.id} onClick={()=>setSelectedQuote(q)}><strong>{q.id}</strong><span>{q.customer}</span><span>{Array.isArray(q.items)?q.items.length:q.item}</span><strong>{money(q.amount)}</strong><Status status={q.status}/></button>)}</div>}
 
     {selectedQuote && <div className="modal-backdrop"><div className="card quotation-document quotation-modal-document"><button className="job-drawer-close" style={{position:"absolute",right:18,top:18}} onClick={()=>setSelectedQuote(null)}><X size={20}/></button>
-      <div className="invoice-document-head"><div><span className="eyebrow">AL KANZ UPHOLSTERY</span><h2>QUOTATION</h2><p>Dubai, UAE · AED</p></div><div className="document-number"><strong>{selectedQuote.id}</strong><span>{selectedQuote.date}</span><span>Valid: {selectedQuote.validity}</span></div></div>
+      <div className="quotation-receipt-banner"><span>RECEIPT / CUSTOMER COPY</span><strong>Quotation document ready</strong><small>This is the same customer-facing receipt style used for bills.</small></div>
+      <div className="invoice-document-head"><div><span className="eyebrow">AL KANZ UPHOLSTERY</span><h2>QUOTATION RECEIPT</h2><p>Dubai, UAE · AED</p></div><div className="document-number"><strong>{selectedQuote.id}</strong><span>{selectedQuote.date}</span><span>Valid: {selectedQuote.validity}</span></div></div>
       <div className="document-parties"><div><small>FROM</small><strong>Al Kanz Upholstery</strong><span>Dubai, UAE</span></div><div><small>TO</small><strong>{selectedQuote.customer}</strong><span>{selectedQuote.phone||"—"}</span><span>{selectedQuote.whatsapp?`WhatsApp ${selectedQuote.whatsapp}`:"WhatsApp —"}</span><span>{selectedQuote.address||"—"}</span></div></div>
       <div className="invoice-items"><div className="invoice-item-head"><span>DESCRIPTION</span><span>QTY</span><span>UNIT PRICE</span><span>TOTAL</span></div>{(selectedQuote.items||[{item:selectedQuote.item,description:selectedQuote.description,quantity:selectedQuote.quantity,unitPrice:selectedQuote.unitPrice}]).map((item,index)=><div className="invoice-item-row" key={index}><span><strong>{item.item}</strong><small>{item.description||"—"}</small></span><span>{item.quantity}</span><span>{money(item.unitPrice)}</span><strong>{money(item.amount ?? Number(item.quantity||0)*Number(item.unitPrice||0))}</strong></div>)}</div>
       <div className="document-totals"><div><span>Subtotal</span><strong>{money(selectedQuote.subtotal)}</strong></div><div><span>Discount</span><strong>- {money(selectedQuote.discount)}</strong></div><div><span>VAT ({selectedQuote.vatRate ?? 5}%)</span><strong>{money(selectedQuote.vat)}</strong></div><div className="grand"><span>Grand Total</span><strong>{money(selectedQuote.amount)}</strong></div></div>
-      <div className="document-actions"><button className="primary-button" onClick={()=>window.print()}><Printer size={16}/> Print Quotation</button><button className="secondary-button" onClick={()=>setPrintOpen(true)}><SlidersHorizontal size={16}/> Print Options</button><button className="secondary-button" onClick={()=>startEdit(selectedQuote)}><Edit3 size={16}/> Edit</button><button className="secondary-button" onClick={()=>setSelectedQuote(null)}>Close</button></div>
+      <div className="quotation-receipt-contact"><div><small>PHONE</small><strong>{selectedQuote.phone||"Not saved"}</strong></div><div><small>WHATSAPP</small><strong>{selectedQuote.whatsapp||selectedQuote.phone||"Not saved"}</strong></div><div><small>ADDRESS</small><strong>{selectedQuote.address||"Dubai, UAE"}</strong></div></div>
+      <div className="invoice-share-center quotation-share-center"><div className="share-center-head"><div><span className="eyebrow">SEND QUOTATION RECEIPT</span><strong>Print, PDF or send directly</strong><small>Use the same customer-facing document for WhatsApp, PDF, email or phone.</small></div></div><div className="post-print-actions"><button type="button" className="share-btn whatsapp" onClick={()=>shareQuotation(selectedQuote,"whatsapp")}><MessageCircle size={17}/> WhatsApp</button><button type="button" className="share-btn" onClick={()=>shareQuotation(selectedQuote,"share")}><ReceiptText size={17}/> Share PDF</button><button type="button" className="share-btn" onClick={()=>shareQuotation(selectedQuote,"phone")}><Phone size={17}/> Call</button>{selectedQuote.email && <button type="button" className="share-btn" onClick={()=>shareQuotation(selectedQuote,"email")}><Mail size={17}/> Email</button>}</div></div>
+      <div className="document-actions"><button className="primary-button" onClick={()=>window.print()}><Printer size={16}/> Print Receipt</button><button className="secondary-button" onClick={()=>setPrintOpen(true)}><SlidersHorizontal size={16}/> Print Options</button><button className="secondary-button" onClick={()=>startEdit(selectedQuote)}><Edit3 size={16}/> Edit</button><button className="secondary-button" onClick={()=>setSelectedQuote(null)}>Close</button></div>
     </div></div>}
 
     {printOpen && <PrintOptionsModal title="Quotation printing" close={()=>setPrintOpen(false)} options={[["Print quotation","Clean customer-facing quotation",()=>window.print()],["Print customer copy","Print another copy for the customer file",()=>window.print()],["Print internal copy","Print a copy for workshop records",()=>window.print()]]}/>} 
