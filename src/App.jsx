@@ -3443,22 +3443,8 @@ function BillingPage({
         }, 250);
       }
     } catch (error) {
-      // Cloud/Appwrite failure must never discard a bill that was already built.
-      // Keep the bill locally so the user can continue working and retry cloud sync later.
-      console.error("Invoice cloud sync failed; keeping bill locally:", error);
-      setJobs?.((items) => editingBill
-        ? (Array.isArray(items) ? items.map(item => String(item.id || item.jobId || item.invoice_id) === String(editingBill.jobId || editingBill.id) ? { ...item, ...bill } : item) : [bill])
-        : [bill, ...(Array.isArray(items) ? items : [])]);
-      if (!editingBill && paidNow > 0) {
-        setPayments?.((items) => [{ id: `PAY-${Date.now()}`, bill_id: bill.id, job_id: bill.id, customer: bill.customer, amount: paidNow, payment_method: bill.paymentMethod, paid_at: bill.date }, ...(Array.isArray(items) ? items : [])]);
-        setTransactions?.((items) => [{ id: `TX-${Date.now()}`, transaction_type: "Income", description: `Invoice · ${bill.customer} · ${bill.id}`, amount: paidNow, account: bill.paymentMethod, transaction_date: bill.date }, ...(Array.isArray(items) ? items : [])]);
-      }
-      setShowBillBuilder(false);
-      setEditingBill(null);
-      setSelected(bill);
-      setPostPrintBill(bill);
-      resetBillForm();
-      alert(`Bill ${bill.id} saved on this device. Cloud sync failed, so it will be kept locally.`);
+      console.error("Invoice creation failed", error);
+      alert(`Bill was not saved: ${error?.message || "database error"}`);
     } finally {
       setSaving(false);
     }
@@ -9383,6 +9369,205 @@ const AL_KANZ_QUOTATION_CONTACT_CSS = `
 @media(max-width:800px){ .customer-contact-inline { grid-template-columns:1fr !important; } }
 `;
 
-const FINAL_CSS = AL_KANZ_QUOTATION_CONTACT_CSS + CSS + AL_KANZ_NEW_UI + AL_KANZ_REDESIGN_CSS + AL_KANZ_FINAL_UI_CSS + AL_KANZ_BILL_TEMPLATE_CSS + AL_KANZ_CRM_DETAIL_CSS + AL_KANZ_PREMIUM_CRM_REPORT_CSS + AL_KANZ_FINAL_RESPONSIVE + AL_KANZ_FINAL_FIX + AL_KANZ_LAST_FIX + AL_KANZ_TRUE_FINAL_FIX + AL_KANZ_FULL_MOTION_CSS + AL_KANZ_LIGHT_UI + BILLING_BUTTON_FIX_CSS + AL_KANZ_LUXURY_GOLD_CSS + AL_KANZ_DAY_NIGHT_CSS + AL_KANZ_CLEAN_THEME_PRODUCTS_CSS;
+
+
+/* ============================================================
+   AL KANZ CUSTOMER DOCUMENT — COMPLETE WARM GOLD THEME
+   Replaces the green/teal receipt palette in both Bill and
+   Quotation customer-facing documents.
+============================================================ */
+const AL_KANZ_DOCUMENT_GOLD_THEME_CSS = `
+.invoice-detail-modal,
+.quotation-modal-document {
+  --doc-ink:#25211c;
+  --doc-muted:#756d62;
+  --doc-soft:#f8f4ec;
+  --doc-soft-2:#f1eadf;
+  --doc-border:#ded4c5;
+  --doc-gold:#b47a2c;
+  --doc-gold-dark:#8f5e1f;
+  --doc-gold-light:#ead4ad;
+  --doc-paper:#fffdf9;
+}
+
+/* Bill document */
+.invoice-paper-screen {
+  background:var(--doc-paper) !important;
+  color:var(--doc-ink) !important;
+  border-color:var(--doc-border) !important;
+}
+.bill-brand-mark {
+  background:linear-gradient(135deg,#d9b36a,#a96d22) !important;
+  color:#fffdf8 !important;
+  box-shadow:0 8px 22px rgba(143,94,31,.18) !important;
+}
+.bill-brand-lockup strong { color:var(--doc-ink) !important; }
+.bill-brand-lockup span,
+.bill-brand-lockup small { color:var(--doc-muted) !important; }
+.bill-title-block span { color:var(--doc-gold-dark) !important; }
+.bill-title-block strong { color:var(--doc-ink) !important; }
+.bill-title-block small { color:var(--doc-muted) !important; }
+.bill-accent-line {
+  background:linear-gradient(90deg,#c89443 0 32%,#e2c58f 32% 100%) !important;
+}
+.bill-company-strip {
+  color:var(--doc-muted) !important;
+  border-bottom-color:var(--doc-border) !important;
+}
+.bill-party {
+  background:var(--doc-soft) !important;
+  border-color:var(--doc-border) !important;
+}
+.bill-party small { color:var(--doc-gold-dark) !important; }
+.bill-party strong { color:var(--doc-ink) !important; }
+.bill-party span { color:var(--doc-muted) !important; }
+.bill-items-table { border-color:var(--doc-border) !important; }
+.bill-items-head {
+  background:var(--doc-soft-2) !important;
+  color:#766a5b !important;
+  border-bottom-color:var(--doc-border) !important;
+}
+.bill-items-row { border-bottom-color:#eee7dc !important; }
+.bill-items-row div strong { color:var(--doc-ink) !important; }
+.bill-items-row div span { color:var(--doc-muted) !important; }
+.bill-thanks {
+  background:var(--doc-soft) !important;
+  border-color:var(--doc-border) !important;
+}
+.bill-thanks span { color:var(--doc-gold-dark) !important; }
+.bill-thanks strong { color:var(--doc-ink) !important; }
+.bill-thanks p { color:var(--doc-muted) !important; }
+.bill-total-box { border-color:var(--doc-border) !important; }
+.bill-total-box>div span { color:var(--doc-muted) !important; }
+.bill-grand-total {
+  background:linear-gradient(135deg,#9b6722,#c28a38) !important;
+  color:#fff !important;
+  box-shadow:0 8px 18px rgba(143,94,31,.15) !important;
+}
+.bill-balance { border-top-color:var(--doc-border) !important; }
+.bill-template-footer {
+  color:var(--doc-muted) !important;
+  border-top-color:var(--doc-border) !important;
+}
+
+/* Bill contact/share cards */
+.invoice-contact-card>div,
+.invoice-share-center {
+  background:var(--doc-soft) !important;
+  border-color:var(--doc-border) !important;
+}
+.invoice-contact-card span { color:var(--doc-muted) !important; }
+.invoice-contact-card strong { color:var(--doc-ink) !important; }
+.share-center-head strong { color:var(--doc-ink) !important; }
+.share-center-head small { color:var(--doc-muted) !important; }
+.invoice-share-center .share-btn {
+  background:#fffdf9 !important;
+  border-color:var(--doc-border) !important;
+  color:var(--doc-ink) !important;
+}
+
+/* Quotation document */
+.quotation-modal-document {
+  background:var(--doc-paper) !important;
+  color:var(--doc-ink) !important;
+  border-color:var(--doc-border) !important;
+}
+.quotation-modal-document .invoice-document-head {
+  border-bottom-color:var(--doc-border) !important;
+}
+.quotation-modal-document .invoice-document-head h2 {
+  color:var(--doc-ink) !important;
+}
+.quotation-modal-document .invoice-document-head p,
+.quotation-modal-document .document-number span {
+  color:var(--doc-muted) !important;
+}
+.quotation-modal-document .document-number strong {
+  border-color:#d9bd8d !important;
+  background:#f7ecd9 !important;
+  color:var(--doc-gold-dark) !important;
+}
+.quotation-modal-document .document-parties > div {
+  background:var(--doc-soft) !important;
+  border-color:var(--doc-border) !important;
+}
+.quotation-modal-document .document-parties small {
+  color:var(--doc-gold-dark) !important;
+}
+.quotation-modal-document .document-parties strong {
+  color:var(--doc-ink) !important;
+}
+.quotation-modal-document .document-parties span {
+  color:var(--doc-muted) !important;
+}
+.quotation-modal-document .invoice-items {
+  border-color:var(--doc-border) !important;
+  background:var(--doc-paper) !important;
+}
+.quotation-modal-document .invoice-item-head {
+  background:var(--doc-soft-2) !important;
+  border-bottom-color:var(--doc-border) !important;
+  color:#766a5b !important;
+}
+.quotation-modal-document .invoice-item-row {
+  border-bottom-color:#eee7dc !important;
+}
+.quotation-modal-document .invoice-item-row > span:first-child strong,
+.quotation-modal-document .invoice-item-row > strong {
+  color:var(--doc-ink) !important;
+}
+.quotation-modal-document .invoice-item-row > span:first-child small {
+  color:var(--doc-muted) !important;
+}
+.quotation-modal-document .document-totals > div {
+  color:var(--doc-muted) !important;
+}
+.quotation-modal-document .document-totals > div strong {
+  color:var(--doc-ink) !important;
+}
+.quotation-modal-document .document-totals .grand {
+  border-top-color:#b47a2c !important;
+  color:var(--doc-gold-dark) !important;
+}
+.quotation-modal-document .document-totals .grand strong {
+  color:var(--doc-gold-dark) !important;
+}
+.quotation-modal-document .quotation-receipt-contact > div {
+  background:var(--doc-soft) !important;
+  border-color:var(--doc-border) !important;
+}
+.quotation-modal-document .quotation-receipt-contact small {
+  color:#938676 !important;
+}
+.quotation-modal-document .quotation-receipt-contact strong {
+  color:var(--doc-ink) !important;
+}
+.quotation-modal-document .invoice-share-center {
+  background:var(--doc-soft) !important;
+  border-color:var(--doc-border) !important;
+}
+.quotation-modal-document .document-actions {
+  border-top-color:var(--doc-border) !important;
+}
+
+/* Make PDF capture use the same paper background */
+.print-invoice-sheet .invoice-paper-screen {
+  background:#fffdf9 !important;
+}
+
+/* Keep the document clean in dark application mode — customer PDF stays light */
+.theme-dark .invoice-paper-screen,
+.theme-dark .quotation-modal-document {
+  background:#fffdf9 !important;
+  color:#25211c !important;
+}
+.theme-dark .invoice-contact-card>div,
+.theme-dark .invoice-share-center {
+  background:#f8f4ec !important;
+  color:#25211c !important;
+}
+`;
+
+const FINAL_CSS = AL_KANZ_QUOTATION_CONTACT_CSS + CSS + AL_KANZ_NEW_UI + AL_KANZ_REDESIGN_CSS + AL_KANZ_FINAL_UI_CSS + AL_KANZ_BILL_TEMPLATE_CSS + AL_KANZ_CRM_DETAIL_CSS + AL_KANZ_PREMIUM_CRM_REPORT_CSS + AL_KANZ_FINAL_RESPONSIVE + AL_KANZ_FINAL_FIX + AL_KANZ_LAST_FIX + AL_KANZ_TRUE_FINAL_FIX + AL_KANZ_FULL_MOTION_CSS + AL_KANZ_LIGHT_UI + BILLING_BUTTON_FIX_CSS + AL_KANZ_LUXURY_GOLD_CSS + AL_KANZ_DAY_NIGHT_CSS + AL_KANZ_CLEAN_THEME_PRODUCTS_CSS + AL_KANZ_DOCUMENT_GOLD_THEME_CSS;
 
 export default App;
