@@ -8857,6 +8857,259 @@ const AL_KANZ_CLEAN_THEME_PRODUCTS_CSS = `
 @media(max-width:480px){.product-catalog-grid{grid-template-columns:1fr}}
 `;
 
-const FINAL_CSS = CSS + AL_KANZ_NEW_UI + AL_KANZ_REDESIGN_CSS + AL_KANZ_FINAL_UI_CSS + AL_KANZ_BILL_TEMPLATE_CSS + AL_KANZ_CRM_DETAIL_CSS + AL_KANZ_PREMIUM_CRM_REPORT_CSS + AL_KANZ_FINAL_RESPONSIVE + AL_KANZ_FINAL_FIX + AL_KANZ_LAST_FIX + AL_KANZ_TRUE_FINAL_FIX + AL_KANZ_FULL_MOTION_CSS + AL_KANZ_LIGHT_UI + BILLING_BUTTON_FIX_CSS + AL_KANZ_LUXURY_GOLD_CSS + AL_KANZ_DAY_NIGHT_CSS + AL_KANZ_CLEAN_THEME_PRODUCTS_CSS;
+
+
+const AL_KANZ_FINAL_LIGHT_FIX = `
+/* =========================================================
+   AL KANZ FINAL LIGHT / NIGHT THEME
+   ========================================================= */
+
+/* LIGHT / DAY */
+.app.theme-day,
+.app.theme-day .main,
+.app.theme-day .content,
+.app.theme-day .page {
+  background:#f6f5f2 !important;
+  color:#252421 !important;
+}
+
+.app.theme-day .sidebar {
+  background:#ffffff !important;
+  color:#292824 !important;
+  border-right:1px solid #e5e1d8 !important;
+}
+
+.app.theme-day .topbar {
+  background:#ffffff !important;
+  border-bottom:1px solid #e5e1d8 !important;
+}
+
+.app.theme-day .quick-nav-inner {
+  background:#ffffff !important;
+  border:1px solid #e3dfd6 !important;
+}
+
+.app.theme-day .card,
+.app.theme-day .table-card,
+.app.theme-day .stat-card,
+.app.theme-day .report-card,
+.app.theme-day .customer-card,
+.app.theme-day .customer-card-premium,
+.app.theme-day .supplier-premium-card,
+.app.theme-day .staff-card,
+.app.theme-day .staff-card-rich,
+.app.theme-day .material-card,
+.app.theme-day .jobs-modern-card,
+.app.theme-day .settings-card,
+.app.theme-day .appearance-card,
+.app.theme-day .quotation-form-card,
+.app.theme-day .quotation-document,
+.app.theme-day .billing-table-card,
+.app.theme-day .billing-transactions-card,
+.app.theme-day .billing-action-strip,
+.app.theme-day .bill-builder-clean,
+.app.theme-day .bill-form-pane,
+.app.theme-day .report-control-panel,
+.app.theme-day .modal,
+.app.theme-day .job-drawer,
+.app.theme-day .crm-profile-modal {
+  background:#ffffff !important;
+  color:#252421 !important;
+  border:1px solid #e4e0d7 !important;
+  box-shadow:0 8px 25px rgba(40,35,25,.055) !important;
+}
+
+/* NO BLACK PERFORMANCE BOXES IN DAY MODE */
+.app.theme-day .performance-hero {
+  background:linear-gradient(135deg,#ffffff 0%,#fbf5e9 100%) !important;
+  color:#252421 !important;
+  border:1px solid #e6dfd1 !important;
+}
+
+.app.theme-day .performance-hero *,
+.app.theme-day .performance-status-grid *,
+.app.theme-day .performance-table-card * {
+  color:#252421 !important;
+}
+
+.app.theme-day .performance-grid > *,
+.app.theme-day .performance-status-grid > div {
+  background:#ffffff !important;
+  color:#252421 !important;
+  border:1px solid #e4e0d7 !important;
+  box-shadow:0 8px 25px rgba(40,35,25,.055) !important;
+}
+
+.app.theme-day .performance-status-grid > div {
+  border-radius:16px !important;
+}
+
+.app.theme-day .performance-status-grid i {
+  background:#c49a52 !important;
+}
+
+.app.theme-day .performance-ring {
+  background:conic-gradient(#c49a52 0 72%,#e9e4da 72% 100%) !important;
+}
+
+.app.theme-day .performance-ring::after {
+  background:#ffffff !important;
+}
+
+.app.theme-day .performance-ring strong,
+.app.theme-day .performance-ring span {
+  color:#252421 !important;
+}
+
+/* TABLES */
+.app.theme-day table,
+.app.theme-day .table-wrap {
+  background:#ffffff !important;
+}
+
+.app.theme-day table th,
+.app.theme-day .table-head {
+  background:#f7f5f1 !important;
+  color:#777168 !important;
+  border-color:#e7e2d9 !important;
+}
+
+.app.theme-day table td,
+.app.theme-day .table-row {
+  background:#ffffff !important;
+  color:#292722 !important;
+  border-color:#eeeae3 !important;
+}
+
+.app.theme-day table tr:hover td,
+.app.theme-day .table-row:hover {
+  background:#fbf8f2 !important;
+}
+
+/* FORMS */
+.app.theme-day input,
+.app.theme-day select,
+.app.theme-day textarea,
+.app.theme-day .field input,
+.app.theme-day .field select {
+  background:#ffffff !important;
+  color:#292722 !important;
+  border-color:#ddd8ce !important;
+}
+
+/* BUTTONS */
+.app.theme-day .primary-button,
+.app.theme-day .create-button,
+.app.theme-day .create-bill-button,
+.app.theme-day .jobs-new-button,
+.app.theme-day button.primary {
+  background:#c49a52 !important;
+  color:#211a0e !important;
+  border-color:#b88b42 !important;
+}
+
+.app.theme-day .secondary-button,
+.app.theme-day .filter-button,
+.app.theme-day .icon-action,
+.app.theme-day .row-action {
+  background:#ffffff !important;
+  color:#4f4b45 !important;
+  border-color:#ddd8ce !important;
+}
+
+/* SIDEBAR */
+.app.theme-day .nav-item,
+.app.theme-day .sub-menu button {
+  color:#666159 !important;
+}
+
+.app.theme-day .nav-item:hover,
+.app.theme-day .sub-menu button:hover {
+  background:#f7f3eb !important;
+  color:#25231f !important;
+}
+
+.app.theme-day .nav-item.active,
+.app.theme-day .nav-item.selected,
+.app.theme-day .sub-menu button.sub-selected {
+  background:#f0dfbd !important;
+  color:#6f4d20 !important;
+  border:1px solid #e6d1a9 !important;
+}
+
+.app.theme-day .account-card,
+.app.theme-day .sidebar-account .account-card {
+  background:#ffffff !important;
+  color:#292722 !important;
+  border:1px solid #e4e0d7 !important;
+}
+
+/* NIGHT */
+.app.theme-night,
+.app.theme-night .main,
+.app.theme-night .content,
+.app.theme-night .page {
+  background:#151619 !important;
+  color:#f3efe7 !important;
+}
+
+.app.theme-night .sidebar {
+  background:#101113 !important;
+  color:#eee9df !important;
+  border-right:1px solid #2e2d2a !important;
+}
+
+.app.theme-night .card,
+.app.theme-night .table-card,
+.app.theme-night .stat-card,
+.app.theme-night .report-card,
+.app.theme-night .customer-card,
+.app.theme-night .staff-card,
+.app.theme-night .material-card,
+.app.theme-night .jobs-modern-card,
+.app.theme-night .settings-card,
+.app.theme-night .quotation-form-card,
+.app.theme-night .quotation-document,
+.app.theme-night .billing-table-card,
+.app.theme-night .modal {
+  background:#1d1e21 !important;
+  color:#f3efe7 !important;
+  border-color:#34332f !important;
+}
+
+.app.theme-night .performance-hero {
+  background:linear-gradient(135deg,#282116,#1d1e21) !important;
+  color:#f3efe7 !important;
+}
+
+.app.theme-night .performance-grid > *,
+.app.theme-night .performance-status-grid > div {
+  background:#202125 !important;
+  color:#f3efe7 !important;
+  border-color:#34332f !important;
+}
+
+.app.theme-night .performance-status-grid i {
+  background:#c49a52 !important;
+}
+
+.app.theme-night input,
+.app.theme-night select,
+.app.theme-night textarea {
+  background:#111214 !important;
+  color:#f3efe7 !important;
+  border-color:#3a3834 !important;
+}
+
+.app.theme-night .primary-button,
+.app.theme-night .create-button,
+.app.theme-night .create-bill-button {
+  background:#c49a52 !important;
+  color:#211a0e !important;
+}
+`;
+
+
+const FINAL_CSS = AL_KANZ_FINAL_LIGHT_FIX + CSS + AL_KANZ_NEW_UI + AL_KANZ_REDESIGN_CSS + AL_KANZ_FINAL_UI_CSS + AL_KANZ_BILL_TEMPLATE_CSS + AL_KANZ_CRM_DETAIL_CSS + AL_KANZ_PREMIUM_CRM_REPORT_CSS + AL_KANZ_FINAL_RESPONSIVE + AL_KANZ_FINAL_FIX + AL_KANZ_LAST_FIX + AL_KANZ_TRUE_FINAL_FIX + AL_KANZ_FULL_MOTION_CSS + AL_KANZ_LIGHT_UI + BILLING_BUTTON_FIX_CSS + AL_KANZ_LUXURY_GOLD_CSS + AL_KANZ_DAY_NIGHT_CSS + AL_KANZ_CLEAN_THEME_PRODUCTS_CSS;
 
 export default App;
