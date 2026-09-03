@@ -391,30 +391,30 @@ const INITIAL_MATERIALS = [
 ];
 
 const PRODUCT_CATALOG = [
-  { id: "product-office-chair", name: "Office Chair", category: "Furniture", unit: "Piece", stock: 12, price: 650, product: true },
-  { id: "product-executive-chair", name: "Executive Office Chair", category: "Furniture", unit: "Piece", stock: 8, price: 950, product: true },
-  { id: "product-single-bed", name: "Single Bed", category: "Furniture", unit: "Piece", stock: 6, price: 1200, product: true },
-  { id: "product-double-bed", name: "Double Bed", category: "Furniture", unit: "Piece", stock: 5, price: 1800, product: true },
-  { id: "product-king-bed", name: "King Size Bed", category: "Furniture", unit: "Piece", stock: 4, price: 2400, product: true },
-  { id: "product-dining-chair", name: "Dining Chair", category: "Furniture", unit: "Piece", stock: 20, price: 280, product: true },
-  { id: "product-sofa-2", name: "2-Seater Sofa", category: "Furniture", unit: "Piece", stock: 5, price: 2200, product: true },
-  { id: "product-sofa-3", name: "3-Seater Sofa", category: "Furniture", unit: "Piece", stock: 4, price: 2900, product: true },
-  { id: "product-recliner", name: "Recliner Chair", category: "Furniture", unit: "Piece", stock: 7, price: 1750, product: true },
-  { id: "product-headboard", name: "Bed Headboard", category: "Furniture", unit: "Piece", stock: 10, price: 900, product: true },
-  { id: "product-single-sofa", name: "Single-Seater Sofa", category: "Furniture", unit: "Piece", stock: 6, price: 1450, product: true },
-  { id: "product-lshape-sofa", name: "L-Shape Sofa", category: "Furniture", unit: "Piece", stock: 3, price: 4200, product: true },
-  { id: "product-sectional-sofa", name: "Sectional Sofa", category: "Furniture", unit: "Piece", stock: 3, price: 5200, product: true },
-  { id: "product-sofa-bed", name: "Sofa Bed", category: "Furniture", unit: "Piece", stock: 4, price: 2600, product: true },
-  { id: "product-ottoman", name: "Ottoman", category: "Furniture", unit: "Piece", stock: 12, price: 550, product: true },
-  { id: "product-footstool", name: "Footstool", category: "Furniture", unit: "Piece", stock: 15, price: 350, product: true },
-  { id: "product-bench", name: "Upholstered Bench", category: "Furniture", unit: "Piece", stock: 8, price: 850, product: true },
-  { id: "product-dining-table", name: "Dining Table", category: "Furniture", unit: "Piece", stock: 5, price: 1900, product: true },
-  { id: "product-coffee-table", name: "Coffee Table", category: "Furniture", unit: "Piece", stock: 8, price: 750, product: true },
-  { id: "product-mattress-single", name: "Single Mattress", category: "Furniture", unit: "Piece", stock: 10, price: 700, product: true },
-  { id: "product-mattress-double", name: "Double Mattress", category: "Furniture", unit: "Piece", stock: 8, price: 1100, product: true },
-  { id: "product-mattress-king", name: "King Mattress", category: "Furniture", unit: "Piece", stock: 6, price: 1500, product: true },
-  { id: "product-wardrobe", name: "Wardrobe", category: "Furniture", unit: "Piece", stock: 4, price: 2200, product: true },
-  { id: "product-tv-unit", name: "TV Unit", category: "Furniture", unit: "Piece", stock: 5, price: 1600, product: true },
+  { id: "product-1", name: "Office Chair", category: "Furniture", unit: "Piece", stock: 12, price: 650, product: true },
+  { id: "product-2", name: "Executive Office Chair", category: "Furniture", unit: "Piece", stock: 8, price: 950, product: true },
+  { id: "product-3", name: "Single Bed", category: "Furniture", unit: "Piece", stock: 6, price: 1200, product: true },
+  { id: "product-4", name: "Double Bed", category: "Furniture", unit: "Piece", stock: 5, price: 1800, product: true },
+  { id: "product-5", name: "King Size Bed", category: "Furniture", unit: "Piece", stock: 4, price: 2400, product: true },
+  { id: "product-6", name: "Dining Chair", category: "Furniture", unit: "Piece", stock: 20, price: 280, product: true },
+  { id: "product-7", name: "2-Seater Sofa", category: "Furniture", unit: "Piece", stock: 5, price: 2200, product: true },
+  { id: "product-8", name: "3-Seater Sofa", category: "Furniture", unit: "Piece", stock: 4, price: 2900, product: true },
+  { id: "product-9", name: "Recliner Chair", category: "Furniture", unit: "Piece", stock: 7, price: 1750, product: true },
+  { id: "product-10", name: "Bed Headboard", category: "Furniture", unit: "Piece", stock: 10, price: 900, product: true },
+  { id: "product-11", name: "Single-Seater Sofa", category: "Furniture", unit: "Piece", stock: 6, price: 1450, product: true },
+  { id: "product-12", name: "L-Shape Sofa", category: "Furniture", unit: "Piece", stock: 3, price: 4200, product: true },
+  { id: "product-13", name: "Sectional Sofa", category: "Furniture", unit: "Piece", stock: 3, price: 5200, product: true },
+  { id: "product-14", name: "Sofa Bed", category: "Furniture", unit: "Piece", stock: 4, price: 2600, product: true },
+  { id: "product-15", name: "Ottoman", category: "Furniture", unit: "Piece", stock: 12, price: 550, product: true },
+  { id: "product-16", name: "Footstool", category: "Furniture", unit: "Piece", stock: 15, price: 350, product: true },
+  { id: "product-17", name: "Upholstered Bench", category: "Furniture", unit: "Piece", stock: 8, price: 850, product: true },
+  { id: "product-18", name: "Dining Table", category: "Furniture", unit: "Piece", stock: 5, price: 1900, product: true },
+  { id: "product-19", name: "Coffee Table", category: "Furniture", unit: "Piece", stock: 8, price: 750, product: true },
+  { id: "product-20", name: "Single Mattress", category: "Furniture", unit: "Piece", stock: 10, price: 700, product: true },
+  { id: "product-21", name: "Double Mattress", category: "Furniture", unit: "Piece", stock: 8, price: 1100, product: true },
+  { id: "product-22", name: "King Mattress", category: "Furniture", unit: "Piece", stock: 6, price: 1500, product: true },
+  { id: "product-23", name: "Wardrobe", category: "Furniture", unit: "Piece", stock: 4, price: 2200, product: true },
+  { id: "product-24", name: "TV Unit", category: "Furniture", unit: "Piece", stock: 5, price: 1600, product: true },
 ];
 
 const INITIAL_SUPPLIERS = [
@@ -870,7 +870,19 @@ function App() {
         const missingProducts = PRODUCT_CATALOG.filter(x => !remoteMaterialNames.has(String(x.name).trim().toLowerCase()));
         setMaterials([...missingProducts, ...remoteMaterials]);
         if (missingProducts.length) {
-          Promise.all(missingProducts.map(product => supabase.from("materials").insert(product))).catch(error => console.error("Product catalogue seed failed:", error));
+          const insertedProducts = await Promise.all(
+            missingProducts.map(product =>
+              supabase.from("materials").insert(product)
+            )
+          );
+
+          const failed = insertedProducts.filter(result => result?.error);
+
+          if (failed.length) {
+            console.error("Some product catalogue items failed to save:", failed);
+          } else {
+            console.log(`✅ Added ${missingProducts.length} AL KANZ products to materials.`);
+          }
         }
         setSuppliers((s.data || []).map(mapSupplier));
         setStaff((st.data || []).map(mapStaff));
