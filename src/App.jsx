@@ -391,30 +391,30 @@ const INITIAL_MATERIALS = [
 ];
 
 const PRODUCT_CATALOG = [
-  { id: "product-1", name: "Office Chair", category: "Furniture", unit: "Piece", stock: 12, price: 650, product: true },
-  { id: "product-2", name: "Executive Office Chair", category: "Furniture", unit: "Piece", stock: 8, price: 950, product: true },
-  { id: "product-3", name: "Single Bed", category: "Furniture", unit: "Piece", stock: 6, price: 1200, product: true },
-  { id: "product-4", name: "Double Bed", category: "Furniture", unit: "Piece", stock: 5, price: 1800, product: true },
-  { id: "product-5", name: "King Size Bed", category: "Furniture", unit: "Piece", stock: 4, price: 2400, product: true },
-  { id: "product-6", name: "Dining Chair", category: "Furniture", unit: "Piece", stock: 20, price: 280, product: true },
-  { id: "product-7", name: "2-Seater Sofa", category: "Furniture", unit: "Piece", stock: 5, price: 2200, product: true },
-  { id: "product-8", name: "3-Seater Sofa", category: "Furniture", unit: "Piece", stock: 4, price: 2900, product: true },
-  { id: "product-9", name: "Recliner Chair", category: "Furniture", unit: "Piece", stock: 7, price: 1750, product: true },
-  { id: "product-10", name: "Bed Headboard", category: "Furniture", unit: "Piece", stock: 10, price: 900, product: true },
-  { id: "product-11", name: "Single-Seater Sofa", category: "Furniture", unit: "Piece", stock: 6, price: 1450, product: true },
-  { id: "product-12", name: "L-Shape Sofa", category: "Furniture", unit: "Piece", stock: 3, price: 4200, product: true },
-  { id: "product-13", name: "Sectional Sofa", category: "Furniture", unit: "Piece", stock: 3, price: 5200, product: true },
-  { id: "product-14", name: "Sofa Bed", category: "Furniture", unit: "Piece", stock: 4, price: 2600, product: true },
-  { id: "product-15", name: "Ottoman", category: "Furniture", unit: "Piece", stock: 12, price: 550, product: true },
-  { id: "product-16", name: "Footstool", category: "Furniture", unit: "Piece", stock: 15, price: 350, product: true },
-  { id: "product-17", name: "Upholstered Bench", category: "Furniture", unit: "Piece", stock: 8, price: 850, product: true },
-  { id: "product-18", name: "Dining Table", category: "Furniture", unit: "Piece", stock: 5, price: 1900, product: true },
-  { id: "product-19", name: "Coffee Table", category: "Furniture", unit: "Piece", stock: 8, price: 750, product: true },
-  { id: "product-20", name: "Single Mattress", category: "Furniture", unit: "Piece", stock: 10, price: 700, product: true },
-  { id: "product-21", name: "Double Mattress", category: "Furniture", unit: "Piece", stock: 8, price: 1100, product: true },
-  { id: "product-22", name: "King Mattress", category: "Furniture", unit: "Piece", stock: 6, price: 1500, product: true },
-  { id: "product-23", name: "Wardrobe", category: "Furniture", unit: "Piece", stock: 4, price: 2200, product: true },
-  { id: "product-24", name: "TV Unit", category: "Furniture", unit: "Piece", stock: 5, price: 1600, product: true },
+  { id: "product-office-chair", name: "Office Chair", category: "Furniture", unit: "Piece", stock: 12, price: 650, product: true },
+  { id: "product-executive-chair", name: "Executive Office Chair", category: "Furniture", unit: "Piece", stock: 8, price: 950, product: true },
+  { id: "product-single-bed", name: "Single Bed", category: "Furniture", unit: "Piece", stock: 6, price: 1200, product: true },
+  { id: "product-double-bed", name: "Double Bed", category: "Furniture", unit: "Piece", stock: 5, price: 1800, product: true },
+  { id: "product-king-bed", name: "King Size Bed", category: "Furniture", unit: "Piece", stock: 4, price: 2400, product: true },
+  { id: "product-dining-chair", name: "Dining Chair", category: "Furniture", unit: "Piece", stock: 20, price: 280, product: true },
+  { id: "product-sofa-2", name: "2-Seater Sofa", category: "Furniture", unit: "Piece", stock: 5, price: 2200, product: true },
+  { id: "product-sofa-3", name: "3-Seater Sofa", category: "Furniture", unit: "Piece", stock: 4, price: 2900, product: true },
+  { id: "product-recliner", name: "Recliner Chair", category: "Furniture", unit: "Piece", stock: 7, price: 1750, product: true },
+  { id: "product-headboard", name: "Bed Headboard", category: "Furniture", unit: "Piece", stock: 10, price: 900, product: true },
+  { id: "product-single-sofa", name: "Single-Seater Sofa", category: "Furniture", unit: "Piece", stock: 6, price: 1450, product: true },
+  { id: "product-lshape-sofa", name: "L-Shape Sofa", category: "Furniture", unit: "Piece", stock: 3, price: 4200, product: true },
+  { id: "product-sectional-sofa", name: "Sectional Sofa", category: "Furniture", unit: "Piece", stock: 3, price: 5200, product: true },
+  { id: "product-sofa-bed", name: "Sofa Bed", category: "Furniture", unit: "Piece", stock: 4, price: 2600, product: true },
+  { id: "product-ottoman", name: "Ottoman", category: "Furniture", unit: "Piece", stock: 12, price: 550, product: true },
+  { id: "product-footstool", name: "Footstool", category: "Furniture", unit: "Piece", stock: 15, price: 350, product: true },
+  { id: "product-bench", name: "Upholstered Bench", category: "Furniture", unit: "Piece", stock: 8, price: 850, product: true },
+  { id: "product-dining-table", name: "Dining Table", category: "Furniture", unit: "Piece", stock: 5, price: 1900, product: true },
+  { id: "product-coffee-table", name: "Coffee Table", category: "Furniture", unit: "Piece", stock: 8, price: 750, product: true },
+  { id: "product-mattress-single", name: "Single Mattress", category: "Furniture", unit: "Piece", stock: 10, price: 700, product: true },
+  { id: "product-mattress-double", name: "Double Mattress", category: "Furniture", unit: "Piece", stock: 8, price: 1100, product: true },
+  { id: "product-mattress-king", name: "King Mattress", category: "Furniture", unit: "Piece", stock: 6, price: 1500, product: true },
+  { id: "product-wardrobe", name: "Wardrobe", category: "Furniture", unit: "Piece", stock: 4, price: 2200, product: true },
+  { id: "product-tv-unit", name: "TV Unit", category: "Furniture", unit: "Piece", stock: 5, price: 1600, product: true },
 ];
 
 const INITIAL_SUPPLIERS = [
@@ -870,19 +870,7 @@ function App() {
         const missingProducts = PRODUCT_CATALOG.filter(x => !remoteMaterialNames.has(String(x.name).trim().toLowerCase()));
         setMaterials([...missingProducts, ...remoteMaterials]);
         if (missingProducts.length) {
-          const insertedProducts = await Promise.all(
-            missingProducts.map(product =>
-              supabase.from("materials").insert(product)
-            )
-          );
-
-          const failed = insertedProducts.filter(result => result?.error);
-
-          if (failed.length) {
-            console.error("Some product catalogue items failed to save:", failed);
-          } else {
-            console.log(`✅ Added ${missingProducts.length} AL KANZ products to materials.`);
-          }
+          Promise.all(missingProducts.map(product => supabase.from("materials").insert(product))).catch(error => console.error("Product catalogue seed failed:", error));
         }
         setSuppliers((s.data || []).map(mapSupplier));
         setStaff((st.data || []).map(mapStaff));
@@ -894,29 +882,6 @@ function App() {
         setDbReady(true);
       } catch (error) {
         console.error("Al Kanz database load failed:", error);
-
-        // Keep the local application usable even when one remote table
-        // temporarily fails. Always expose the built-in AL KANZ product
-        // catalogue so products remain available in Materials/Billing.
-        const localProducts = PRODUCT_CATALOG.map(product => ({
-          ...product,
-          product: true,
-        }));
-
-        setMaterials(prev => {
-          const current = Array.isArray(prev) ? prev : [];
-          const existingNames = new Set(
-            current.map(x => String(x.name || "").trim().toLowerCase())
-          );
-
-          return [
-            ...localProducts.filter(
-              x => !existingNames.has(String(x.name).trim().toLowerCase())
-            ),
-            ...current,
-          ];
-        });
-
         setDbReady(false);
       } finally {
         setLoadingData(false);
@@ -941,17 +906,18 @@ function App() {
   const ownerNavigation = NAVIGATION;
   const staffNavigation = NAVIGATION.map(group => ({
     ...group,
-    items: group.items.filter(item => ["Materials", "Billing", "Reports"].includes(item.name))
+    items: group.items.filter(item => ["Materials", "Billing", "Quotations", "Reports"].includes(item.name))
   })).filter(group => group.items.length);
   const visibleNavigation = role === "owner" ? ownerNavigation : staffNavigation;
   const ownerQuickNav = QUICK_NAV;
   const staffQuickNav = [
     { name: "Billing", icon: Receipt },
     { name: "Materials", icon: Package },
+    { name: "Quotations", icon: FileText },
     { name: "Reports", icon: BarChart3 },
   ];
   const visibleQuickNav = role === "owner" ? ownerQuickNav : staffQuickNav;
-  const allowedStaffPages = new Set(["Billing","Main","Transactions","Invoices","Payments","Materials","Reports"]);
+  const allowedStaffPages = new Set(["Billing","Main","Transactions","Invoices","Payments","Materials","Quotations","New Quotation","All Quotations","Reports"]);
 
   const handleLogin = ({ user, role: nextRole }) => {
     setSessionUser(user);
@@ -1666,10 +1632,12 @@ const netCash = totalPaid - totalExpenses;
                 quotations={quotations}
                 setQuotations={setQuotations}
                 jobs={jobs}
+                customers={customers}
+                materials={materials}
               />
             )}
 
-            {page === "Quotation Performance" && role === "owner" && (
+            {page === "Quotation Performance" && (
               <QuotationPerformancePage quotations={quotations} jobs={jobs} navigate={navigate} />
             )}
 
@@ -2871,19 +2839,24 @@ function BillingPage({
     const quote = safeQuotations.find((item) => String(item.id) === String(quotationId));
     setBillForm((form) => ({ ...form, quotationId }));
     if (!quote) return;
-    setBillItems([{
-      id: Date.now(),
-      materialId: "",
-      item: quote.item || "",
-      description: quote.description || "",
-      quantity: String(quote.quantity || 1),
-      unitPrice: String(quote.unitPrice || 0),
-    }]);
+    const quoteItems = Array.isArray(quote.items) && quote.items.length
+      ? quote.items
+      : [{ item: quote.item || "", description: quote.description || "", quantity: quote.quantity || 1, unitPrice: quote.unitPrice || 0, materialId: quote.materialId || "" }];
+    setBillItems(quoteItems.map((item, index) => ({
+      id: `${Date.now()}-${index}`,
+      materialId: item.materialId || "",
+      item: item.item || "",
+      description: item.description || "",
+      quantity: String(item.quantity || 1),
+      unitPrice: String(item.unitPrice || 0),
+    })));
     setBillForm((form) => ({
       ...form,
       quotationId,
       customer: form.customer || quote.customer || "",
       phone: form.phone || quote.phone || "",
+      whatsapp: form.whatsapp || quote.whatsapp || quote.phone || "",
+      address: form.address || quote.address || "",
     }));
   };
 
@@ -3230,6 +3203,11 @@ function BillingPage({
                   <label className="field"><span>Customer name <em>(optional)</em></span><input value={billForm.customer} onChange={e=>setBillForm(f=>({...f,customer:e.target.value}))} placeholder="Enter customer name or leave blank" /></label>
                 </div>
                 {filteredCustomers.length > 0 && <div className="customer-search-results">{filteredCustomers.map(customer=><button type="button" key={customer.id} className="customer-search-option" onClick={()=>selectCustomer(customer)}><span className="customer-search-avatar">{String(customer.name||"C").split(" ").map(x=>x[0]).join("").slice(0,2).toUpperCase()}</span><span><strong>{customer.name||customer.company}</strong><small>{customer.phone||"No phone"} · {customer.email||"No email"}</small></span><ChevronRight size={16}/></button>)}</div>}
+                <div className="bill-inline-grid customer-contact-inline">
+                  <label className="field"><span>Phone number</span><input type="tel" value={billForm.phone} onChange={e=>setBillForm(f=>({...f,phone:e.target.value}))} placeholder="+971 50 000 0000" /></label>
+                  <label className="field"><span>WhatsApp number</span><input type="tel" value={billForm.whatsapp} onChange={e=>setBillForm(f=>({...f,whatsapp:e.target.value}))} placeholder="+971 50 000 0000" /></label>
+                  <label className="field customer-address-field"><span>Address</span><input value={billForm.address} onChange={e=>setBillForm(f=>({...f,address:e.target.value}))} placeholder="Dubai, UAE" /></label>
+                </div>
                 <div className="bill-inline-grid quotation-inline"><label className="field"><span>Related quotation</span><select value={billForm.quotationId} onChange={e=>applyQuotation(e.target.value)}><option value="">No quotation</option>{safeQuotations.map(q=><option key={q.id} value={q.id}>{q.id} · {q.customer||"Customer"} · {money(q.amount)}</option>)}</select></label><div className="linked-info"><span>QUOTATION LINK</span><strong>{billForm.quotationId || "None"}</strong><small>Performance is shown in the Quotations section.</small></div></div>
                 <div className="bill-section-title compact-title"><span>02</span><div><strong>Bill items</strong><small>Each item stays on one line: material, description, quantity, unit price and amount.</small></div></div>
                 <div className="bill-line-editor">
@@ -3534,146 +3512,144 @@ function QuotationPerformancePage({ quotations = [], jobs = [], navigate }) {
   </>;
 }
 
-function QuotationPage({ page, quotations = [], setQuotations }) {
+function QuotationPage({ page, quotations = [], setQuotations, customers = [], materials = [] }) {
+  const safeQuotations = Array.isArray(quotations) ? quotations : [];
+  const safeCustomers = Array.isArray(customers) ? customers : [];
+  const safeMaterials = Array.isArray(materials) ? materials : [];
   const [form, setForm] = useState({
     customer: "",
+    customerId: "",
     phone: "",
-    item: "",
-    description: "",
-    quantity: "1",
-    unitPrice: "",
+    whatsapp: "",
+    address: "",
     validity: "30 days",
+    discount: "0",
+    vat: "5",
   });
+  const blankItems = () => Array.from({length: 6}, (_, index) => ({ id:`q-${Date.now()}-${index}-${Math.random()}`, materialId:"", item:"", description:"", quantity:"1", unitPrice:"" }));
+  const [items, setItems] = useState(blankItems);
+  const [customerSearch, setCustomerSearch] = useState("");
   const [showForm, setShowForm] = useState(page === "New Quotation");
   const [selectedQuote, setSelectedQuote] = useState(null);
-  const [printOpen, setPrintOpen] = useState(false);
-  const [aiText, setAiText] = useState("");
   const [editingQuote, setEditingQuote] = useState(null);
+  const [printOpen, setPrintOpen] = useState(false);
 
-  const safeQuotations = Array.isArray(quotations) ? quotations : [];
-  const subtotal = Number(form.quantity || 0) * Number(form.unitPrice || 0);
-  const vat = subtotal * 0.05;
-  const grandTotal = subtotal + vat;
+  const filteredCustomers = useMemo(() => {
+    const q = customerSearch.trim().toLowerCase();
+    if (!q) return [];
+    return safeCustomers.filter(c => [c.name,c.phone,c.whatsapp,c.email,c.address,c.location].some(v => String(v||"").toLowerCase().includes(q))).slice(0,8);
+  }, [safeCustomers, customerSearch]);
 
-  const runQuotationAI = () => {
-    const item = form.item || "your upholstery service";
-    const customer = form.customer || "the customer";
-    const tips = [
-      `Suggested scope: Inspect ${item}, confirm material/colour, complete the upholstery work, quality-check the finish and hand over after approval.`,
-      `Pricing tip: keep the quotation itemized and show labour, materials, VAT and the final total separately.`,
-      `Customer note: ${customer} should approve the quotation before the work is converted into an invoice.`,
-    ];
-    setAiText(tips.join(" "));
+  const subtotal = items.reduce((sum, item) => sum + Math.max(0, Number(item.quantity||0) * Number(item.unitPrice||0)), 0);
+  const discountAmount = Math.min(subtotal, Math.max(0, Number(form.discount||0)));
+  const taxable = Math.max(0, subtotal - discountAmount);
+  const vatAmount = taxable * (Number(form.vat||0) / 100);
+  const grandTotal = taxable + vatAmount;
+
+  const selectCustomer = (customer) => {
+    setForm(f => ({...f, customerId:String(customer.id), customer:customer.name||customer.company||"", phone:customer.phone||"", whatsapp:customer.whatsapp||customer.phone||"", address:customer.address||customer.location||""}));
+    setCustomerSearch(customer.name || "");
+  };
+
+  const selectMaterial = (index, materialId) => {
+    const material = safeMaterials.find(m => String(m.id) === String(materialId));
+    setItems(prev => prev.map((item,i) => i===index ? {...item, materialId:String(materialId||""), item:material?.name||item.item, description:material ? `${material.category||"Furniture"} · ${material.unit||"Piece"}` : item.description, unitPrice:material ? String(material.price||0) : item.unitPrice} : item));
+  };
+
+  const updateItem = (index,key,value) => setItems(prev => prev.map((item,i)=>i===index?{...item,[key]:value}:item));
+  const removeItem = (index) => setItems(prev => prev.length > 1 ? prev.filter((_,i)=>i!==index) : prev);
+
+  const reset = () => {
+    setForm({customer:"",customerId:"",phone:"",whatsapp:"",address:"",validity:"30 days",discount:"0",vat:"5"});
+    setItems(blankItems());
+    setCustomerSearch("");
+    setEditingQuote(null);
   };
 
   const save = () => {
-    if (!form.customer || !form.item || !form.unitPrice) {
-      alert("Customer, item and unit price are required.");
-      return;
-    }
+    const validItems = items.filter(item => item.item.trim() && Number(item.unitPrice||0) > 0).map(item => ({
+      materialId:item.materialId||"", item:item.item.trim(), description:item.description.trim(), quantity:Number(item.quantity||1), unitPrice:Number(item.unitPrice||0), amount:Number(item.quantity||0)*Number(item.unitPrice||0)
+    }));
+    if (!form.customer.trim() || !validItems.length) return alert("Customer and at least one item with a unit price are required.");
     const q = {
-      ...(editingQuote || {}),
-      id: editingQuote?.id || `QT-${String(Date.now()).slice(-6)}`,
-      ...form,
-      quantity: Number(form.quantity || 1),
-      unitPrice: Number(form.unitPrice || 0),
-      subtotal,
-      vat,
-      amount: grandTotal,
-      status: editingQuote?.status || "Draft",
-      date: new Date().toLocaleDateString("en-AE"),
+      ...(editingQuote || {}), id:editingQuote?.id || `QT-${String(Date.now()).slice(-6)}`,
+      customer:form.customer.trim(), customerId:form.customerId, phone:form.phone.trim(), whatsapp:form.whatsapp.trim(), address:form.address.trim(),
+      items:validItems, item:validItems[0].item, description:validItems[0].description, quantity:validItems.length===1?validItems[0].quantity:validItems.reduce((a,b)=>a+b.quantity,0), unitPrice:validItems.length===1?validItems[0].unitPrice:0,
+      subtotal, discount:discountAmount, vatRate:Number(form.vat||0), vat:vatAmount, amount:grandTotal, total:grandTotal,
+      validity:form.validity, status:editingQuote?.status || "Draft", date:new Date().toLocaleDateString("en-AE")
     };
-    setQuotations(prev => editingQuote ? prev.map(x => x.id === editingQuote.id ? q : x) : [q, ...(Array.isArray(prev) ? prev : [])]);
-    setSelectedQuote(q);
-    setEditingQuote(null);
-    setForm({ customer:"", phone:"", item:"", description:"", quantity:"1", unitPrice:"", validity:"30 days" });
-    setShowForm(false);
+    setQuotations(prev => editingQuote ? prev.map(x=>x.id===editingQuote.id?q:x) : [q,...(Array.isArray(prev)?prev:[])]);
+    setSelectedQuote(q); setShowForm(false); setEditingQuote(null); reset();
   };
 
-  return (
-    <>
-      <PageTitle
-        eyebrow="SALES · UAE"
-        title={page === "New Quotation" ? "New Quotation" : "Quotations"}
-        subtitle="Create professional quotations using the same clean document structure as an invoice."
-        button={!showForm ? "New Quotation" : null}
-        onClick={() => setShowForm(true)}
-      />
+  const startEdit = (q) => {
+    setSelectedQuote(null); setEditingQuote(q); setShowForm(true);
+    setForm({customer:q.customer||"",customerId:String(q.customerId||""),phone:q.phone||"",whatsapp:q.whatsapp||q.phone||"",address:q.address||"",validity:q.validity||"30 days",discount:String(q.discount||0),vat:String(q.vatRate ?? 5)});
+    const sourceItems = Array.isArray(q.items)&&q.items.length ? q.items : [{item:q.item||"",description:q.description||"",quantity:q.quantity||1,unitPrice:q.unitPrice||0,materialId:q.materialId||""}];
+    setItems(sourceItems.map((item,index)=>({id:`edit-${q.id}-${index}`,materialId:item.materialId||"",item:item.item||"",description:item.description||"",quantity:String(item.quantity||1),unitPrice:String(item.unitPrice||0)})));
+    setCustomerSearch(q.customer||"");
+  };
 
-      {showForm && (
-        <div className="quotation-invoice-layout">
-          <div className="card quotation-form-card">
-            <CardHeader eyebrow="QUOTATION DETAILS" title={editingQuote ? "Edit quotation" : "Create quotation"} subtitle="Every quotation field can be edited before saving." />
-            <div className="settings-form">
-              <label>Customer<input value={form.customer} onChange={e=>setForm({...form,customer:e.target.value})} placeholder="Customer name" /></label>
-              <label>Phone<input value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} placeholder="+971..." /></label>
-              <label>Item / Service<input value={form.item} onChange={e=>setForm({...form,item:e.target.value})} placeholder="Sofa upholstery, car seat, etc." /></label>
-              <label>Quantity<input type="number" min="1" value={form.quantity} onChange={e=>setForm({...form,quantity:e.target.value})} /></label>
-              <label>Unit Price (AED)<input type="number" min="0" value={form.unitPrice} onChange={e=>setForm({...form,unitPrice:e.target.value})} placeholder="0.00" /></label>
-              <label>Validity<select value={form.validity} onChange={e=>setForm({...form,validity:e.target.value})}><option>7 days</option><option>15 days</option><option>30 days</option><option>60 days</option></select></label>
-              <label className="full-field">Description<textarea value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Work included, materials, terms..." rows="4" /></label>
-              <div className="quotation-ai-box full-field">
-                <div><Sparkles size={17}/><div><strong>AI quotation helper</strong><small>Generate a professional scope and pricing reminder from your form.</small></div></div>
-                <button type="button" className="secondary-button" onClick={runQuotationAI}><Sparkles size={15}/> Help me</button>
-                {aiText && <p>{aiText}</p>}
-              </div>
-              <div className="settings-form-actions full-field quotation-action-bar"><button type="button" className="primary-button" onClick={save}><Save size={16}/> {editingQuote ? "Update Quotation" : "Save Quotation"}</button><button type="button" className="secondary-button" onClick={()=>setPrintOpen(true)}><Printer size={16}/> Print Options</button><button type="button" className="secondary-button" onClick={()=>setShowForm(false)}>Cancel</button></div>
-            </div>
+  return <>
+    <PageTitle eyebrow="SALES · UAE" title={page === "New Quotation" ? "New Quotation" : "Quotations"} subtitle="Create quotations in the same professional line-item format as your bills." button={!showForm?"New Quotation":null} onClick={()=>{reset();setShowForm(true);}} />
+
+    {showForm && <div className="quotation-invoice-layout">
+      <div className="card quotation-form-card">
+        <CardHeader eyebrow="QUOTATION DETAILS" title={editingQuote?"Edit quotation":"Create quotation"} subtitle="Customer contact, multiple items, pricing, VAT and totals." />
+        <div className="settings-form">
+          <div className="bill-section-title"><span>01</span><div><strong>Customer</strong><small>Search a saved customer or enter the details manually.</small></div></div>
+          <div className="bill-inline-grid customer-inline">
+            <label className="field"><span>Search customer</span><input autoFocus value={customerSearch} onChange={e=>setCustomerSearch(e.target.value)} placeholder="Search name / phone / WhatsApp..." /></label>
+            <label className="field"><span>Customer name</span><input value={form.customer} onChange={e=>setForm({...form,customer:e.target.value})} placeholder="Customer name" /></label>
+          </div>
+          {filteredCustomers.length>0 && <div className="customer-search-results">{filteredCustomers.map(c=><button type="button" key={c.id} className="customer-search-option" onClick={()=>selectCustomer(c)}><span className="customer-search-avatar">{String(c.name||"C").split(" ").map(x=>x[0]).join("").slice(0,2).toUpperCase()}</span><span><strong>{c.name||c.company}</strong><small>{c.phone||"No phone"} · {c.whatsapp||c.phone||"No WhatsApp"}</small></span><ChevronRight size={16}/></button>)}</div>}
+          <div className="bill-inline-grid customer-contact-inline">
+            <label className="field"><span>Phone number</span><input type="tel" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} placeholder="+971 50 000 0000" /></label>
+            <label className="field"><span>WhatsApp number</span><input type="tel" value={form.whatsapp} onChange={e=>setForm({...form,whatsapp:e.target.value})} placeholder="+971 50 000 0000" /></label>
+            <label className="field"><span>Address</span><input value={form.address} onChange={e=>setForm({...form,address:e.target.value})} placeholder="Dubai, UAE" /></label>
           </div>
 
-          <div className="card quotation-document">
-            <div className="invoice-document-head">
-              <div><span className="eyebrow">AL KANZ UPHOLSTERY</span><h2>QUOTATION</h2><p>Dubai, UAE · AED</p></div>
-              <div className="document-number"><strong>QT-PREVIEW</strong><span>Date: {new Date().toLocaleDateString("en-AE")}</span><span>Valid: {form.validity}</span></div>
-            </div>
-            <div className="document-parties"><div><small>FROM</small><strong>Al Kanz Upholstery</strong><span>Dubai, UAE</span></div><div><small>TO</small><strong>{form.customer || "Customer Name"}</strong><span>{form.phone || "Customer phone"}</span></div></div>
-            <div className="invoice-items">
-              <div className="invoice-item-head"><span>DESCRIPTION</span><span>QTY</span><span>UNIT PRICE</span><span>TOTAL</span></div>
-              <div className="invoice-item-row"><span><strong>{form.item || "Item / Service"}</strong><small>{form.description || "Description of proposed work"}</small></span><span>{form.quantity || 1}</span><span>{money(form.unitPrice)}</span><strong>{money(subtotal)}</strong></div>
-            </div>
-            <div className="document-totals"><div><span>Subtotal</span><strong>{money(subtotal)}</strong></div><div><span>VAT (5%)</span><strong>{money(vat)}</strong></div><div className="grand"><span>Grand Total</span><strong>{money(grandTotal)}</strong></div></div>
-            <div className="document-note"><strong>Quotation terms</strong><span>This quotation is a demo estimate and is valid for {form.validity}. Final billing may vary based on approved work or materials.</span></div>
+          <div className="bill-section-title compact-title"><span>02</span><div><strong>Quotation items</strong><small>Same horizontal item structure used by Billing.</small></div></div>
+          <div className="bill-line-editor quotation-bill-editor">
+            <div className="bill-line-head"><span>#</span><span>Material / service</span><span>Item</span><span>Description</span><span>Qty</span><span>Unit price</span><span>Amount</span><span></span></div>
+            {items.map((item,index)=><div className="bill-line-row" key={item.id}>
+              <span className="line-number">{String(index+1).padStart(2,"0")}</span>
+              <select value={item.materialId} onChange={e=>selectMaterial(index,e.target.value)}><option value="">Custom item</option>{safeMaterials.map(m=><option key={m.id} value={m.id}>{m.name} · {money(m.price)}</option>)}</select>
+              <input value={item.item} onChange={e=>updateItem(index,"item",e.target.value)} placeholder="Item / service" />
+              <input value={item.description} onChange={e=>updateItem(index,"description",e.target.value)} placeholder="Description" />
+              <input type="number" min="0.01" step="0.01" value={item.quantity} onChange={e=>updateItem(index,"quantity",e.target.value)} />
+              <input type="number" min="0" step="0.01" value={item.unitPrice} onChange={e=>updateItem(index,"unitPrice",e.target.value)} placeholder="0.00" />
+              <input value={money(Number(item.quantity||0)*Number(item.unitPrice||0))} readOnly />
+              <button type="button" className="icon-action danger-action" onClick={()=>removeItem(index)}><Trash2 size={15}/></button>
+            </div>)}
           </div>
-        </div>
-      )}
 
-      {!showForm && (
-        <div className="table-card">
-          <div className="table-head"><span>QUOTE</span><span>CUSTOMER</span><span>ITEM</span><span>AMOUNT</span><span>STATUS</span></div>
-          {safeQuotations.length === 0 ? <EmptyState icon={FileText} title="No quotations yet" text="Create your first quotation." /> : safeQuotations.map(q => (
-            <button type="button" className="table-row quotation-row-button" key={q.id} onClick={()=>setSelectedQuote(q)}>
-              <strong>{q.id}</strong><span>{q.customer}</span><span>{q.item}</span><strong>{money(q.amount)}</strong><Status status={q.status}/>
-            </button>
-          ))}
+          <div className="bill-inline-grid finance-inline"><label className="field"><span>Discount (AED)</span><input type="number" min="0" value={form.discount} onChange={e=>setForm({...form,discount:e.target.value})}/></label><label className="field"><span>VAT (%)</span><input type="number" min="0" max="100" step="0.1" value={form.vat} onChange={e=>setForm({...form,vat:e.target.value})}/></label><label className="field"><span>Validity</span><select value={form.validity} onChange={e=>setForm({...form,validity:e.target.value})}><option>7 days</option><option>15 days</option><option>30 days</option><option>60 days</option></select></label></div>
+          <div className="settings-form-actions full-field"><button type="button" className="primary-button" onClick={save}><Save size={16}/>{editingQuote?"Update Quotation":"Save Quotation"}</button><button type="button" className="secondary-button" onClick={()=>setPrintOpen(true)}><Printer size={16}/> Print Options</button><button type="button" className="secondary-button" onClick={()=>{reset();setShowForm(false);}}>Cancel</button></div>
         </div>
-      )}
+      </div>
 
-      {selectedQuote && (
-        <div className="modal-backdrop">
-          <div className="card quotation-document quotation-modal-document">
-            <button className="job-drawer-close" style={{position:"absolute",right:18,top:18}} onClick={()=>setSelectedQuote(null)}><X size={20}/></button>
-            <div className="invoice-document-head"><div><span className="eyebrow">AL KANZ UPHOLSTERY</span><h2>QUOTATION</h2><p>Dubai, UAE · AED</p></div><div className="document-number"><strong>{selectedQuote.id}</strong><span>{selectedQuote.date}</span><span>Valid: {selectedQuote.validity}</span></div></div>
-            <div className="document-parties"><div><small>FROM</small><strong>Al Kanz Upholstery</strong><span>Dubai, UAE</span></div><div><small>TO</small><strong>{selectedQuote.customer}</strong><span>{selectedQuote.phone || "—"}</span></div></div>
-            <div className="invoice-items"><div className="invoice-item-head"><span>DESCRIPTION</span><span>QTY</span><span>UNIT PRICE</span><span>TOTAL</span></div><div className="invoice-item-row"><span><strong>{selectedQuote.item}</strong><small>{selectedQuote.description || "—"}</small></span><span>{selectedQuote.quantity}</span><span>{money(selectedQuote.unitPrice)}</span><strong>{money(selectedQuote.subtotal)}</strong></div></div>
-            <div className="document-totals"><div><span>Subtotal</span><strong>{money(selectedQuote.subtotal)}</strong></div><div><span>VAT (5%)</span><strong>{money(selectedQuote.vat)}</strong></div><div className="grand"><span>Grand Total</span><strong>{money(selectedQuote.amount)}</strong></div></div>
-            <div className="document-actions"><button className="primary-button" onClick={()=>window.print()}><Printer size={16}/> Print Quotation</button><button className="secondary-button" onClick={()=>setPrintOpen(true)}><SlidersHorizontal size={16}/> Print Options</button><button className="secondary-button" onClick={()=>{ const copy={...selectedQuote,id:`QT-${String(Date.now()).slice(-6)}`,status:"Draft",date:new Date().toLocaleDateString("en-AE")}; setQuotations(prev=>[copy,...prev]); setSelectedQuote(copy); }}><RefreshCw size={16}/> Duplicate</button><button className="secondary-button" onClick={()=>{ setSelectedQuote(null); setEditingQuote(selectedQuote); setShowForm(true); setForm({customer:selectedQuote.customer,phone:selectedQuote.phone||"",item:selectedQuote.item,description:selectedQuote.description||"",quantity:String(selectedQuote.quantity||1),unitPrice:String(selectedQuote.unitPrice||0),validity:selectedQuote.validity||"30 days"}); }}> <Edit3 size={16}/> Edit</button><button className="secondary-button" onClick={()=>setSelectedQuote(null)}>Close</button></div>
-          </div>
-        </div>
-      )}
+      <div className="card quotation-document">
+        <div className="invoice-document-head"><div><span className="eyebrow">AL KANZ UPHOLSTERY</span><h2>QUOTATION</h2><p>Dubai, UAE · AED</p></div><div className="document-number"><strong>QT-PREVIEW</strong><span>{new Date().toLocaleDateString("en-AE")}</span><span>Valid: {form.validity}</span></div></div>
+        <div className="document-parties"><div><small>FROM</small><strong>Al Kanz Upholstery</strong><span>Dubai, UAE</span></div><div><small>TO</small><strong>{form.customer||"Customer Name"}</strong><span>{form.phone||"Phone —"}</span><span>{form.whatsapp?`WhatsApp ${form.whatsapp}`:"WhatsApp —"}</span><span>{form.address||"Address —"}</span></div></div>
+        <div className="invoice-items"><div className="invoice-item-head"><span>DESCRIPTION</span><span>QTY</span><span>UNIT PRICE</span><span>TOTAL</span></div>{items.map((item,index)=>item.item||Number(item.unitPrice)>0?<div className="invoice-item-row" key={item.id}><span><strong>{item.item||"Item / Service"}</strong><small>{item.description||"Upholstery service"}</small></span><span>{item.quantity||1}</span><span>{money(item.unitPrice)}</span><strong>{money(Number(item.quantity||0)*Number(item.unitPrice||0))}</strong></div>:null)}</div>
+        <div className="document-totals"><div><span>Subtotal</span><strong>{money(subtotal)}</strong></div><div><span>Discount</span><strong>- {money(discountAmount)}</strong></div><div><span>VAT ({form.vat}%)</span><strong>{money(vatAmount)}</strong></div><div className="grand"><span>Grand Total</span><strong>{money(grandTotal)}</strong></div></div>
+        <div className="document-note"><strong>Quotation terms</strong><span>This quotation is valid for {form.validity}. Final billing follows the approved scope and materials.</span></div>
+      </div>
+    </div>}
 
-      {printOpen && (
-        <PrintOptionsModal
-          title="Quotation printing"
-          close={() => setPrintOpen(false)}
-          options={[
-            ["Print quotation", "Clean customer-facing quotation", () => window.print()],
-            ["Print customer copy", "Print another copy for the customer file", () => window.print()],
-            ["Print internal copy", "Print a copy for workshop records", () => window.print()],
-          ]}
-        />
-      )}
-    </>
-  );
+    {!showForm && <div className="table-card"><div className="table-head"><span>QUOTE</span><span>CUSTOMER</span><span>ITEMS</span><span>AMOUNT</span><span>STATUS</span></div>{safeQuotations.length===0?<EmptyState icon={FileText} title="No quotations yet" text="Create your first quotation."/>:safeQuotations.map(q=><button type="button" className="table-row quotation-row-button" key={q.id} onClick={()=>setSelectedQuote(q)}><strong>{q.id}</strong><span>{q.customer}</span><span>{Array.isArray(q.items)?q.items.length:q.item}</span><strong>{money(q.amount)}</strong><Status status={q.status}/></button>)}</div>}
+
+    {selectedQuote && <div className="modal-backdrop"><div className="card quotation-document quotation-modal-document"><button className="job-drawer-close" style={{position:"absolute",right:18,top:18}} onClick={()=>setSelectedQuote(null)}><X size={20}/></button>
+      <div className="invoice-document-head"><div><span className="eyebrow">AL KANZ UPHOLSTERY</span><h2>QUOTATION</h2><p>Dubai, UAE · AED</p></div><div className="document-number"><strong>{selectedQuote.id}</strong><span>{selectedQuote.date}</span><span>Valid: {selectedQuote.validity}</span></div></div>
+      <div className="document-parties"><div><small>FROM</small><strong>Al Kanz Upholstery</strong><span>Dubai, UAE</span></div><div><small>TO</small><strong>{selectedQuote.customer}</strong><span>{selectedQuote.phone||"—"}</span><span>{selectedQuote.whatsapp?`WhatsApp ${selectedQuote.whatsapp}`:"WhatsApp —"}</span><span>{selectedQuote.address||"—"}</span></div></div>
+      <div className="invoice-items"><div className="invoice-item-head"><span>DESCRIPTION</span><span>QTY</span><span>UNIT PRICE</span><span>TOTAL</span></div>{(selectedQuote.items||[{item:selectedQuote.item,description:selectedQuote.description,quantity:selectedQuote.quantity,unitPrice:selectedQuote.unitPrice}]).map((item,index)=><div className="invoice-item-row" key={index}><span><strong>{item.item}</strong><small>{item.description||"—"}</small></span><span>{item.quantity}</span><span>{money(item.unitPrice)}</span><strong>{money(item.amount ?? Number(item.quantity||0)*Number(item.unitPrice||0))}</strong></div>)}</div>
+      <div className="document-totals"><div><span>Subtotal</span><strong>{money(selectedQuote.subtotal)}</strong></div><div><span>Discount</span><strong>- {money(selectedQuote.discount)}</strong></div><div><span>VAT ({selectedQuote.vatRate ?? 5}%)</span><strong>{money(selectedQuote.vat)}</strong></div><div className="grand"><span>Grand Total</span><strong>{money(selectedQuote.amount)}</strong></div></div>
+      <div className="document-actions"><button className="primary-button" onClick={()=>window.print()}><Printer size={16}/> Print Quotation</button><button className="secondary-button" onClick={()=>setPrintOpen(true)}><SlidersHorizontal size={16}/> Print Options</button><button className="secondary-button" onClick={()=>startEdit(selectedQuote)}><Edit3 size={16}/> Edit</button><button className="secondary-button" onClick={()=>setSelectedQuote(null)}>Close</button></div>
+    </div></div>}
+
+    {printOpen && <PrintOptionsModal title="Quotation printing" close={()=>setPrintOpen(false)} options={[["Print quotation","Clean customer-facing quotation",()=>window.print()],["Print customer copy","Print another copy for the customer file",()=>window.print()],["Print internal copy","Print a copy for workshop records",()=>window.print()]]}/>} 
+  </>;
 }
 
 /* ============================================================
@@ -8894,257 +8870,21 @@ const AL_KANZ_CLEAN_THEME_PRODUCTS_CSS = `
 
 
 
-const AL_KANZ_FINAL_LIGHT_FIX = `
-/* =========================================================
-   AL KANZ FINAL LIGHT / NIGHT THEME
-   ========================================================= */
-
-/* LIGHT / DAY */
-.app.theme-day,
-.app.theme-day .main,
-.app.theme-day .content,
-.app.theme-day .page {
-  background:#f6f5f2 !important;
-  color:#252421 !important;
-}
-
-.app.theme-day .sidebar {
-  background:#ffffff !important;
-  color:#292824 !important;
-  border-right:1px solid #e5e1d8 !important;
-}
-
-.app.theme-day .topbar {
-  background:#ffffff !important;
-  border-bottom:1px solid #e5e1d8 !important;
-}
-
-.app.theme-day .quick-nav-inner {
-  background:#ffffff !important;
-  border:1px solid #e3dfd6 !important;
-}
-
-.app.theme-day .card,
-.app.theme-day .table-card,
-.app.theme-day .stat-card,
-.app.theme-day .report-card,
-.app.theme-day .customer-card,
-.app.theme-day .customer-card-premium,
-.app.theme-day .supplier-premium-card,
-.app.theme-day .staff-card,
-.app.theme-day .staff-card-rich,
-.app.theme-day .material-card,
-.app.theme-day .jobs-modern-card,
-.app.theme-day .settings-card,
-.app.theme-day .appearance-card,
-.app.theme-day .quotation-form-card,
-.app.theme-day .quotation-document,
-.app.theme-day .billing-table-card,
-.app.theme-day .billing-transactions-card,
-.app.theme-day .billing-action-strip,
-.app.theme-day .bill-builder-clean,
-.app.theme-day .bill-form-pane,
-.app.theme-day .report-control-panel,
-.app.theme-day .modal,
-.app.theme-day .job-drawer,
-.app.theme-day .crm-profile-modal {
-  background:#ffffff !important;
-  color:#252421 !important;
-  border:1px solid #e4e0d7 !important;
-  box-shadow:0 8px 25px rgba(40,35,25,.055) !important;
-}
-
-/* NO BLACK PERFORMANCE BOXES IN DAY MODE */
-.app.theme-day .performance-hero {
-  background:linear-gradient(135deg,#ffffff 0%,#fbf5e9 100%) !important;
-  color:#252421 !important;
-  border:1px solid #e6dfd1 !important;
-}
-
-.app.theme-day .performance-hero *,
-.app.theme-day .performance-status-grid *,
-.app.theme-day .performance-table-card * {
-  color:#252421 !important;
-}
-
-.app.theme-day .performance-grid > *,
-.app.theme-day .performance-status-grid > div {
-  background:#ffffff !important;
-  color:#252421 !important;
-  border:1px solid #e4e0d7 !important;
-  box-shadow:0 8px 25px rgba(40,35,25,.055) !important;
-}
-
-.app.theme-day .performance-status-grid > div {
-  border-radius:16px !important;
-}
-
-.app.theme-day .performance-status-grid i {
-  background:#c49a52 !important;
-}
-
-.app.theme-day .performance-ring {
-  background:conic-gradient(#c49a52 0 72%,#e9e4da 72% 100%) !important;
-}
-
-.app.theme-day .performance-ring::after {
-  background:#ffffff !important;
-}
-
-.app.theme-day .performance-ring strong,
-.app.theme-day .performance-ring span {
-  color:#252421 !important;
-}
-
-/* TABLES */
-.app.theme-day table,
-.app.theme-day .table-wrap {
-  background:#ffffff !important;
-}
-
-.app.theme-day table th,
-.app.theme-day .table-head {
-  background:#f7f5f1 !important;
-  color:#777168 !important;
-  border-color:#e7e2d9 !important;
-}
-
-.app.theme-day table td,
-.app.theme-day .table-row {
-  background:#ffffff !important;
-  color:#292722 !important;
-  border-color:#eeeae3 !important;
-}
-
-.app.theme-day table tr:hover td,
-.app.theme-day .table-row:hover {
-  background:#fbf8f2 !important;
-}
-
-/* FORMS */
-.app.theme-day input,
-.app.theme-day select,
-.app.theme-day textarea,
-.app.theme-day .field input,
-.app.theme-day .field select {
-  background:#ffffff !important;
-  color:#292722 !important;
-  border-color:#ddd8ce !important;
-}
-
-/* BUTTONS */
-.app.theme-day .primary-button,
-.app.theme-day .create-button,
-.app.theme-day .create-bill-button,
-.app.theme-day .jobs-new-button,
-.app.theme-day button.primary {
-  background:#c49a52 !important;
-  color:#211a0e !important;
-  border-color:#b88b42 !important;
-}
-
-.app.theme-day .secondary-button,
-.app.theme-day .filter-button,
-.app.theme-day .icon-action,
-.app.theme-day .row-action {
-  background:#ffffff !important;
-  color:#4f4b45 !important;
-  border-color:#ddd8ce !important;
-}
-
-/* SIDEBAR */
-.app.theme-day .nav-item,
-.app.theme-day .sub-menu button {
-  color:#666159 !important;
-}
-
-.app.theme-day .nav-item:hover,
-.app.theme-day .sub-menu button:hover {
-  background:#f7f3eb !important;
-  color:#25231f !important;
-}
-
-.app.theme-day .nav-item.active,
-.app.theme-day .nav-item.selected,
-.app.theme-day .sub-menu button.sub-selected {
-  background:#f0dfbd !important;
-  color:#6f4d20 !important;
-  border:1px solid #e6d1a9 !important;
-}
-
-.app.theme-day .account-card,
-.app.theme-day .sidebar-account .account-card {
-  background:#ffffff !important;
-  color:#292722 !important;
-  border:1px solid #e4e0d7 !important;
-}
-
-/* NIGHT */
-.app.theme-night,
-.app.theme-night .main,
-.app.theme-night .content,
-.app.theme-night .page {
-  background:#151619 !important;
-  color:#f3efe7 !important;
-}
-
-.app.theme-night .sidebar {
-  background:#101113 !important;
-  color:#eee9df !important;
-  border-right:1px solid #2e2d2a !important;
-}
-
-.app.theme-night .card,
-.app.theme-night .table-card,
-.app.theme-night .stat-card,
-.app.theme-night .report-card,
-.app.theme-night .customer-card,
-.app.theme-night .staff-card,
-.app.theme-night .material-card,
-.app.theme-night .jobs-modern-card,
-.app.theme-night .settings-card,
-.app.theme-night .quotation-form-card,
-.app.theme-night .quotation-document,
-.app.theme-night .billing-table-card,
-.app.theme-night .modal {
-  background:#1d1e21 !important;
-  color:#f3efe7 !important;
-  border-color:#34332f !important;
-}
-
-.app.theme-night .performance-hero {
-  background:linear-gradient(135deg,#282116,#1d1e21) !important;
-  color:#f3efe7 !important;
-}
-
-.app.theme-night .performance-grid > *,
-.app.theme-night .performance-status-grid > div {
-  background:#202125 !important;
-  color:#f3efe7 !important;
-  border-color:#34332f !important;
-}
-
-.app.theme-night .performance-status-grid i {
-  background:#c49a52 !important;
-}
-
-.app.theme-night input,
-.app.theme-night select,
-.app.theme-night textarea {
-  background:#111214 !important;
-  color:#f3efe7 !important;
-  border-color:#3a3834 !important;
-}
-
-.app.theme-night .primary-button,
-.app.theme-night .create-button,
-.app.theme-night .create-bill-button {
-  background:#c49a52 !important;
-  color:#211a0e !important;
-}
+const AL_KANZ_QUOTATION_CONTACT_CSS = `
+.customer-contact-inline { grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
+.customer-address-field { grid-column: span 1; }
+.quotation-bill-editor { overflow-x:auto; }
+.quotation-bill-editor .bill-line-head,
+.quotation-bill-editor .bill-line-row { min-width: 980px; grid-template-columns: 36px minmax(180px,1.2fr) minmax(150px,1fr) minmax(180px,1.3fr) 70px 110px 120px 40px !important; }
+.app.theme-day .customer-contact-inline .field input,
+.app.theme-day .quotation-bill-editor input,
+.app.theme-day .quotation-bill-editor select { background:#fff !important; color:#282722 !important; }
+.app.theme-night .customer-contact-inline .field input,
+.app.theme-night .quotation-bill-editor input,
+.app.theme-night .quotation-bill-editor select { background:#111214 !important; color:#f3efe7 !important; }
+@media(max-width:800px){ .customer-contact-inline { grid-template-columns:1fr !important; } }
 `;
 
-
-const FINAL_CSS = AL_KANZ_FINAL_LIGHT_FIX + CSS + AL_KANZ_NEW_UI + AL_KANZ_REDESIGN_CSS + AL_KANZ_FINAL_UI_CSS + AL_KANZ_BILL_TEMPLATE_CSS + AL_KANZ_CRM_DETAIL_CSS + AL_KANZ_PREMIUM_CRM_REPORT_CSS + AL_KANZ_FINAL_RESPONSIVE + AL_KANZ_FINAL_FIX + AL_KANZ_LAST_FIX + AL_KANZ_TRUE_FINAL_FIX + AL_KANZ_FULL_MOTION_CSS + AL_KANZ_LIGHT_UI + BILLING_BUTTON_FIX_CSS + AL_KANZ_LUXURY_GOLD_CSS + AL_KANZ_DAY_NIGHT_CSS + AL_KANZ_CLEAN_THEME_PRODUCTS_CSS;
+const FINAL_CSS = AL_KANZ_QUOTATION_CONTACT_CSS + CSS + AL_KANZ_NEW_UI + AL_KANZ_REDESIGN_CSS + AL_KANZ_FINAL_UI_CSS + AL_KANZ_BILL_TEMPLATE_CSS + AL_KANZ_CRM_DETAIL_CSS + AL_KANZ_PREMIUM_CRM_REPORT_CSS + AL_KANZ_FINAL_RESPONSIVE + AL_KANZ_FINAL_FIX + AL_KANZ_LAST_FIX + AL_KANZ_TRUE_FINAL_FIX + AL_KANZ_FULL_MOTION_CSS + AL_KANZ_LIGHT_UI + BILLING_BUTTON_FIX_CSS + AL_KANZ_LUXURY_GOLD_CSS + AL_KANZ_DAY_NIGHT_CSS + AL_KANZ_CLEAN_THEME_PRODUCTS_CSS;
 
 export default App;
