@@ -401,6 +401,20 @@ const PRODUCT_CATALOG = [
   { id: "product-sofa-3", name: "3-Seater Sofa", category: "Furniture", unit: "Piece", stock: 4, price: 2900, product: true },
   { id: "product-recliner", name: "Recliner Chair", category: "Furniture", unit: "Piece", stock: 7, price: 1750, product: true },
   { id: "product-headboard", name: "Bed Headboard", category: "Furniture", unit: "Piece", stock: 10, price: 900, product: true },
+  { id: "product-single-sofa", name: "Single-Seater Sofa", category: "Furniture", unit: "Piece", stock: 6, price: 1450, product: true },
+  { id: "product-lshape-sofa", name: "L-Shape Sofa", category: "Furniture", unit: "Piece", stock: 3, price: 4200, product: true },
+  { id: "product-sectional-sofa", name: "Sectional Sofa", category: "Furniture", unit: "Piece", stock: 3, price: 5200, product: true },
+  { id: "product-sofa-bed", name: "Sofa Bed", category: "Furniture", unit: "Piece", stock: 4, price: 2600, product: true },
+  { id: "product-ottoman", name: "Ottoman", category: "Furniture", unit: "Piece", stock: 12, price: 550, product: true },
+  { id: "product-footstool", name: "Footstool", category: "Furniture", unit: "Piece", stock: 15, price: 350, product: true },
+  { id: "product-bench", name: "Upholstered Bench", category: "Furniture", unit: "Piece", stock: 8, price: 850, product: true },
+  { id: "product-dining-table", name: "Dining Table", category: "Furniture", unit: "Piece", stock: 5, price: 1900, product: true },
+  { id: "product-coffee-table", name: "Coffee Table", category: "Furniture", unit: "Piece", stock: 8, price: 750, product: true },
+  { id: "product-mattress-single", name: "Single Mattress", category: "Furniture", unit: "Piece", stock: 10, price: 700, product: true },
+  { id: "product-mattress-double", name: "Double Mattress", category: "Furniture", unit: "Piece", stock: 8, price: 1100, product: true },
+  { id: "product-mattress-king", name: "King Mattress", category: "Furniture", unit: "Piece", stock: 6, price: 1500, product: true },
+  { id: "product-wardrobe", name: "Wardrobe", category: "Furniture", unit: "Piece", stock: 4, price: 2200, product: true },
+  { id: "product-tv-unit", name: "TV Unit", category: "Furniture", unit: "Piece", stock: 5, price: 1600, product: true },
 ];
 
 const INITIAL_SUPPLIERS = [
@@ -8486,70 +8500,22 @@ const AL_KANZ_DAY_NIGHT_CSS = `
 }
 
 .app.theme-day .sidebar {
-  background:linear-gradient(180deg,#ffffff 0%,#faf9f6 100%) !important;
-  color:#292824 !important;
-  border-right:1px solid #e6e2d9 !important;
-  box-shadow:8px 0 28px rgba(35,30,20,.055) !important;
+  background:linear-gradient(180deg,#191919 0%,#242424 100%) !important;
+  color:#eeeae1 !important;
+  border-right:1px solid #30302f !important;
+  box-shadow:12px 0 35px rgba(0,0,0,.07) !important;
 }
-
-.app.theme-day .brand strong {
-  color:#24231f !important;
-}
-
-.app.theme-day .brand span {
-  color:#8a867d !important;
-}
-
+.app.theme-day .brand strong { color:#f7f3eb !important; }
+.app.theme-day .brand span { color:#9d988f !important; }
 .app.theme-day .brand-logo,
 .app.theme-day .account-avatar {
-  background:linear-gradient(145deg,#f0d79e,#c69b54) !important;
-  color:#241c0e !important;
-  box-shadow:0 5px 16px rgba(170,130,55,.16) !important;
+  background:linear-gradient(145deg,#f0d79e,#bd9550) !important;
+  color:#211a0e !important;
 }
-
 .app.theme-day .workshop-status {
-  background:#f5faf7 !important;
-  border:1px solid #dce9e1 !important;
-  color:#46564f !important;
-}
-
-.app.theme-day .nav-section-title {
-  color:#9a958b !important;
-}
-
-.app.theme-day .nav-item,
-.app.theme-day .sub-menu button {
-  color:#625f58 !important;
-}
-
-.app.theme-day .nav-item:hover,
-.app.theme-day .sub-menu button:hover {
-  background:#f6f2e9 !important;
-  color:#292722 !important;
-}
-
-.app.theme-day .nav-item.active,
-.app.theme-day .nav-item.selected,
-.app.theme-day .sub-menu button.sub-selected {
-  background:linear-gradient(135deg,#ead09a,#d6b66f) !important;
-  color:#29200f !important;
-  box-shadow:0 5px 16px rgba(177,138,62,.13) !important;
-}
-
-.app.theme-day .nav-item.active svg,
-.app.theme-day .nav-item.selected svg {
-  color:#5b431b !important;
-}
-
-.app.theme-day .sidebar-account {
-  border-top:1px solid #e7e3da !important;
-}
-
-.app.theme-day .sidebar-account .account-card {
-  background:#ffffff !important;
-  border:1px solid #e6e2d9 !important;
-  color:#292722 !important;
-  box-shadow:0 5px 18px rgba(35,30,20,.045) !important;
+  background:#292929 !important;
+  border-color:#3a3a39 !important;
+  color:#ddd8ce !important;
 }
 .app.theme-day .nav-section-title { color:#807c74 !important; }
 .app.theme-day .nav-item,
@@ -8805,6 +8771,92 @@ const AL_KANZ_DAY_NIGHT_CSS = `
 @media(max-width:700px){ .theme-options-two { grid-template-columns:1fr !important; } }
 `;
 
-const FINAL_CSS = CSS + AL_KANZ_NEW_UI + AL_KANZ_REDESIGN_CSS + AL_KANZ_FINAL_UI_CSS + AL_KANZ_BILL_TEMPLATE_CSS + AL_KANZ_CRM_DETAIL_CSS + AL_KANZ_PREMIUM_CRM_REPORT_CSS + AL_KANZ_FINAL_RESPONSIVE + AL_KANZ_FINAL_FIX + AL_KANZ_LAST_FIX + AL_KANZ_TRUE_FINAL_FIX + AL_KANZ_FULL_MOTION_CSS + AL_KANZ_LIGHT_UI + BILLING_BUTTON_FIX_CSS + AL_KANZ_LUXURY_GOLD_CSS + AL_KANZ_DAY_NIGHT_CSS;
+
+
+const AL_KANZ_CLEAN_THEME_PRODUCTS_CSS = `
+/* ===== AL KANZ CLEAN LIGHT / NIGHT THEME ===== */
+.app.theme-day {
+  --bg:#f4f2ee !important;
+  --white:#ffffff !important;
+  --soft:#fbfaf8 !important;
+  --green:#b47a3c !important;
+  --green-dark:#8f5d2b !important;
+  --green-light:#f6eadc !important;
+  --text:#22211f !important;
+  --text-2:#5f5b55 !important;
+  --muted:#8c877f !important;
+  --border:#e4dfd6 !important;
+  --shadow:0 12px 32px rgba(38,31,22,.07) !important;
+  background:#f4f2ee !important;
+  color:#22211f !important;
+}
+.app.theme-day .sidebar {
+  background:#fffdf9 !important;
+  color:#3a3732 !important;
+  border-right:1px solid #e4dfd6 !important;
+  box-shadow:6px 0 24px rgba(40,34,25,.045) !important;
+}
+.app.theme-day .brand strong {color:#26231f !important}
+.app.theme-day .brand span {color:#918b82 !important}
+.app.theme-day .workshop-status {background:#f7f5f0 !important;border:1px solid #e3ddd3 !important;color:#5b574f !important}
+.app.theme-day .nav-section-title {color:#a19b91 !important}
+.app.theme-day .nav-item,.app.theme-day .sub-menu button {color:#625d55 !important}
+.app.theme-day .nav-item:hover,.app.theme-day .sub-menu button:hover {background:#f5f0e8 !important;color:#292722 !important}
+.app.theme-day .nav-item.active,.app.theme-day .nav-item.selected,.app.theme-day .sub-menu button.sub-selected {
+  background:#f1e2c9 !important;color:#7a4f20 !important;box-shadow:none !important;border:1px solid #ead7b9 !important;
+}
+.app.theme-day .topbar {background:rgba(255,253,249,.94) !important;border-bottom:1px solid #e4dfd6 !important;color:#292722 !important}
+.app.theme-day .page,.app.theme-day .content,.app.theme-day .main {background:#f4f2ee !important;color:#22211f !important}
+.app.theme-day .card,.app.theme-day .table-card,.app.theme-day .jobs-modern-card,.app.theme-day .settings-card,.app.theme-day .appearance-card,.app.theme-day .customer-card,.app.theme-day .customer-card-premium {
+  background:#fffdf9 !important;border:1px solid #e4dfd6 !important;box-shadow:var(--shadow) !important;color:#292722 !important;
+}
+.app.theme-day .card h1,.app.theme-day .card h2,.app.theme-day .card h3,.app.theme-day .page-title h1,.app.theme-day .page-intro h1,.app.theme-day strong {color:#25231f !important}
+.app.theme-day input,.app.theme-day select,.app.theme-day textarea,.app.theme-day .field input,.app.theme-day .field select {
+  background:#ffffff !important;color:#292722 !important;border:1px solid #ded8ce !important;
+}
+.app.theme-day input:focus,.app.theme-day select:focus,.app.theme-day textarea:focus {border-color:#c9995c !important;box-shadow:0 0 0 3px rgba(201,153,92,.12) !important}
+.app.theme-day .primary-button,.app.theme-day .create-button,.app.theme-day button.primary {
+  background:#b47a3c !important;color:#fff !important;border:1px solid #a86e32 !important;box-shadow:0 7px 18px rgba(180,122,60,.18) !important;
+}
+.app.theme-day .secondary-button {background:#fffdf9 !important;color:#514b43 !important;border:1px solid #ddd6ca !important}
+.app.theme-day .stat-card,.app.theme-day .report-box,.app.theme-day .metric-card {background:#fffdf9 !important;color:#292722 !important;border:1px solid #e4dfd6 !important}
+.app.theme-day .performance-hero {
+  background:linear-gradient(135deg,#fffdf9 0%,#f7ecdc 100%) !important;
+  color:#292722 !important;border:1px solid #e4dfd6 !important;box-shadow:0 14px 34px rgba(45,35,23,.08) !important;
+}
+.app.theme-day .performance-hero strong,.app.theme-day .performance-hero span,.app.theme-day .performance-hero p {color:#292722 !important}
+.app.theme-day .performance-ring {background:conic-gradient(#b47a3c 0 72%,#e4ddd2 72%) !important}
+.app.theme-day .performance-ring:after {background:#fffdf9 !important}
+.app.theme-day .performance-ring strong,.app.theme-day .performance-ring span {color:#292722 !important}
+.app.theme-day .performance-status-grid>div {background:#fffdf9 !important;border-color:#e4dfd6 !important;color:#292722 !important}
+.app.theme-day .performance-status-grid i {background:#b47a3c !important}
+.app.theme-day .sidebar-account {border-top:1px solid #e4dfd6 !important}
+.app.theme-day .sidebar-account .account-card {background:#fffdf9 !important;border:1px solid #e4dfd6 !important;color:#292722 !important}
+.app.theme-day .bill-line-head {background:#f5f1eb !important;color:#746e65 !important}
+.app.theme-day .bill-line-row {background:#fffdf9 !important;border-bottom:1px solid #eee9e1 !important}
+
+/* NIGHT VISION */
+.app.theme-night {color-scheme:dark !important;background:#151619 !important;color:#f2eee7 !important}
+.app.theme-night .sidebar {background:#101113 !important;border-right:1px solid #2a2927 !important}
+.app.theme-night .main,.app.theme-night .content,.app.theme-night .page {background:#151619 !important;color:#f2eee7 !important}
+.app.theme-night .card,.app.theme-night .table-card,.app.theme-night .jobs-modern-card,.app.theme-night .settings-card,.app.theme-night .appearance-card,.app.theme-night .customer-card,.app.theme-night .customer-card-premium {
+  background:#1d1e21 !important;border-color:#302f2c !important;color:#f2eee7 !important;box-shadow:0 14px 35px rgba(0,0,0,.22) !important;
+}
+.app.theme-night .performance-hero {background:linear-gradient(135deg,#25201a,#1b1c1f) !important;border-color:#493a27 !important}
+.app.theme-night .performance-status-grid>div {background:#202125 !important;border-color:#34332f !important}
+
+/* PRODUCT CATALOG CARDS */
+.product-catalog-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:16px}
+.product-catalog-card {background:var(--surface,#fffdf9);border:1px solid var(--border,#e4dfd6);border-radius:16px;padding:16px;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.product-catalog-card:hover {transform:translateY(-3px);box-shadow:0 12px 28px rgba(30,25,18,.08);border-color:#c9995c}
+.product-catalog-card .product-icon {width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#f6eadc;color:#a86e32;margin-bottom:12px}
+.product-catalog-card h4 {margin:0 0 5px;font-size:15px;color:var(--text,#292722)}
+.product-catalog-card p {margin:0;color:var(--muted,#8c877f);font-size:12px}
+@media(max-width:1050px){.product-catalog-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.product-catalog-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.product-catalog-grid{grid-template-columns:1fr}}
+`;
+
+const FINAL_CSS = CSS + AL_KANZ_NEW_UI + AL_KANZ_REDESIGN_CSS + AL_KANZ_FINAL_UI_CSS + AL_KANZ_BILL_TEMPLATE_CSS + AL_KANZ_CRM_DETAIL_CSS + AL_KANZ_PREMIUM_CRM_REPORT_CSS + AL_KANZ_FINAL_RESPONSIVE + AL_KANZ_FINAL_FIX + AL_KANZ_LAST_FIX + AL_KANZ_TRUE_FINAL_FIX + AL_KANZ_FULL_MOTION_CSS + AL_KANZ_LIGHT_UI + BILLING_BUTTON_FIX_CSS + AL_KANZ_LUXURY_GOLD_CSS + AL_KANZ_DAY_NIGHT_CSS + AL_KANZ_CLEAN_THEME_PRODUCTS_CSS;
 
 export default App;
