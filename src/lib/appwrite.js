@@ -1,4 +1,4 @@
-import { Client, TablesDB, ID, Query } from "appwrite";
+import { Client, TablesDB, ID, Query, Account } from "appwrite";
 
 const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID;
 
@@ -16,6 +16,7 @@ const client = new Client()
   .setProject(projectId);
 
 export const databases = new TablesDB(client);
+export const account = new Account(client);
 
 export { ID, Query };
 

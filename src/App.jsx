@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { databases, ID, Query } from "./lib/appwrite";
+import { databases, ID, Query, account } from "./lib/appwrite";
 
 // Appwrite compatibility layer for the existing Al Kanz UI.
 // It keeps the existing CRUD code readable while removing Supabase.
@@ -206,6 +206,8 @@ import {
   Package,
   Truck,
   UserRound,
+  LockKeyhole,
+  EyeOff,
   Receipt,
   BarChart3,
   Wallet,
@@ -388,6 +390,19 @@ const INITIAL_MATERIALS = [
   },
 ];
 
+const PRODUCT_CATALOG = [
+  { id: "product-office-chair", name: "Office Chair", category: "Furniture", unit: "Piece", stock: 12, price: 650, product: true },
+  { id: "product-executive-chair", name: "Executive Office Chair", category: "Furniture", unit: "Piece", stock: 8, price: 950, product: true },
+  { id: "product-single-bed", name: "Single Bed", category: "Furniture", unit: "Piece", stock: 6, price: 1200, product: true },
+  { id: "product-double-bed", name: "Double Bed", category: "Furniture", unit: "Piece", stock: 5, price: 1800, product: true },
+  { id: "product-king-bed", name: "King Size Bed", category: "Furniture", unit: "Piece", stock: 4, price: 2400, product: true },
+  { id: "product-dining-chair", name: "Dining Chair", category: "Furniture", unit: "Piece", stock: 20, price: 280, product: true },
+  { id: "product-sofa-2", name: "2-Seater Sofa", category: "Furniture", unit: "Piece", stock: 5, price: 2200, product: true },
+  { id: "product-sofa-3", name: "3-Seater Sofa", category: "Furniture", unit: "Piece", stock: 4, price: 2900, product: true },
+  { id: "product-recliner", name: "Recliner Chair", category: "Furniture", unit: "Piece", stock: 7, price: 1750, product: true },
+  { id: "product-headboard", name: "Bed Headboard", category: "Furniture", unit: "Piece", stock: 10, price: 900, product: true },
+];
+
 const INITIAL_SUPPLIERS = [
   {
     id: 1,
@@ -466,7 +481,7 @@ const NAVIGATION = [
     section: "BILLING",
     items: [
       { name: "Billing", icon: Receipt, children: ["Main", "Transactions", "Invoices", "Payments"] },
-      { name: "Quotations", icon: FileText, children: ["New Quotation", "All Quotations"] },
+      { name: "Quotations", icon: FileText, children: ["New Quotation", "All Quotations", "Quotation Performance"] },
     ],
   },
   {
@@ -621,7 +636,154 @@ const mapStaff = (row) => ({
   attendance: Number(row.attendance || 0), performance: Number(row.performance || 0), status: row.status || "Active", notes: row.notes || "",
 });
 
+const LOGIN_ONLY_CSS = `
+.ak-login-page{min-height:100vh;width:100vw;position:fixed;inset:0;overflow:hidden;display:grid;place-items:center;background:#07100d;color:#f7f8f3;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.ak-login-page:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 20%,rgba(191,235,98,.13),transparent 28%),radial-gradient(circle at 85% 80%,rgba(46,139,111,.16),transparent 30%),linear-gradient(135deg,#050b09 0%,#0a1712 48%,#07100d 100%)}
+.ak-login-grid{position:absolute;inset:-40px;opacity:.22;background-image:linear-gradient(rgba(210,235,175,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(210,235,175,.035) 1px,transparent 1px);background-size:56px 56px;animation:akGridMove 22s linear infinite}
+.ak-login-orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(3px)}
+.ak-login-orb.a{width:460px;height:460px;left:-230px;top:-210px;background:radial-gradient(circle,rgba(195,239,102,.15),transparent 68%);animation:akOrb1 10s ease-in-out infinite}
+.ak-login-orb.b{width:560px;height:560px;right:-280px;bottom:-270px;background:radial-gradient(circle,rgba(43,135,107,.18),transparent 68%);animation:akOrb2 13s ease-in-out infinite}
+.ak-login-orb.c{width:180px;height:180px;left:68%;top:12%;background:radial-gradient(circle,rgba(223,195,91,.08),transparent 68%);animation:akOrb3 8s ease-in-out infinite}
+.ak-login-card{position:relative;z-index:5;width:min(430px,calc(100vw - 36px));box-sizing:border-box;padding:42px;border:1px solid rgba(207,235,170,.17);border-radius:30px;background:rgba(13,25,21,.91);box-shadow:0 36px 110px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.055);backdrop-filter:blur(30px);animation:akLoginIn .7s cubic-bezier(.2,.8,.2,1) both}
+.ak-login-brand{display:flex;align-items:center;justify-content:center;margin-bottom:34px}.ak-login-brand-mark{width:62px;height:62px;border-radius:19px;display:grid;place-items:center;background:#c9ef6a;color:#0d1b14;box-shadow:0 15px 38px rgba(201,239,106,.2);animation:akBrandFloat 3s ease-in-out infinite}.ak-login-brand-text{display:none}
+.ak-login-heading{text-align:center;margin-bottom:28px}.ak-login-heading h1{font-size:34px;line-height:1.05;letter-spacing:-.045em;margin:0 0 9px}.ak-login-heading p{margin:0;color:#8fa39a;font-size:15px}
+.ak-login-fields{display:grid;gap:17px}.ak-login-fields label{display:grid;gap:8px}.ak-login-fields label>span{text-transform:uppercase;font-size:11px;font-weight:900;letter-spacing:.13em;color:#adbbb5}
+.ak-login-input{height:60px;display:flex;align-items:center;gap:12px;padding:0 15px;border:1px solid #2d4138;border-radius:14px;background:#091510;transition:.22s ease}.ak-login-input:focus-within{border-color:#bce86a;box-shadow:0 0 0 4px rgba(201,239,106,.08),0 15px 35px rgba(0,0,0,.18)}.ak-login-input>svg{color:#71887d;flex:0 0 auto}.ak-login-input input{min-width:0;flex:1;height:100%;border:0;outline:0;background:transparent;color:#f8faf4;font:500 16px inherit}.ak-login-input input::placeholder{color:#52675e}.ak-login-eye{border:0;background:transparent;color:#71887d;cursor:pointer;padding:5px;display:grid;place-items:center}.ak-login-eye:hover{color:#c9ef6a}
+.ak-login-error{margin-top:15px;padding:10px 12px;border-radius:10px;background:rgba(196,60,60,.12);border:1px solid rgba(245,115,115,.2);color:#ffb7b7;font-size:13px;text-align:center}
+.ak-login-button{width:100%;height:60px;margin-top:21px;border:0;border-radius:14px;background:#c9ef6a;color:#0b1711;display:flex;align-items:center;justify-content:center;gap:12px;font:900 16px inherit;cursor:pointer;box-shadow:0 15px 38px rgba(201,239,106,.18);transition:.2s ease}.ak-login-button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 21px 45px rgba(201,239,106,.26);filter:brightness(1.04)}.ak-login-button:disabled{opacity:.65;cursor:wait}.ak-login-button-arrow{font-size:20px;line-height:1}
+@keyframes akLoginIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}@keyframes akBrandFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(-2deg)}}@keyframes akOrb1{0%,100%{transform:translate(0,0)}50%{transform:translate(35px,25px)}}@keyframes akOrb2{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,-25px)}}@keyframes akOrb3{0%,100%{transform:scale(1);opacity:.65}50%{transform:scale(1.2);opacity:1}}@keyframes akGridMove{to{background-position:56px 56px}}
+@media(max-width:560px){.ak-login-card{padding:34px 24px;border-radius:24px}.ak-login-brand{margin-bottom:28px}.ak-login-brand-mark{width:56px;height:56px}.ak-login-heading h1{font-size:30px}.ak-login-input,.ak-login-button{height:57px}}
+`;
+
+const LOGIN_USERS = {
+  owner: { username: "owner", password: "owner123", role: "owner", label: "Owner" },
+  staff: { username: "staff", password: "staff123", role: "staff", label: "Staff" },
+};
+
+function LoginScreen({ onLogin }) {
+  const [selectedRole, setSelectedRole] = useState("owner");
+  const [username, setUsername] = useState("owner");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const chooseRole = (role) => {
+    setSelectedRole(role);
+    setUsername(LOGIN_USERS[role].username);
+    setPassword("");
+    setError("");
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setError("");
+    const expected = LOGIN_USERS[selectedRole];
+    if (!username.trim() || !password) {
+      setError("Enter username and password.");
+      return;
+    }
+    setBusy(true);
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    if (username.trim().toLowerCase() !== expected.username || password !== expected.password) {
+      setError("Invalid username or password.");
+      setBusy(false);
+      return;
+    }
+    const user = { id: `local-${expected.role}`, name: expected.label, username: expected.username };
+    localStorage.setItem("al-kanz-session", JSON.stringify({ user, role: expected.role }));
+    onLogin({ user, role: expected.role });
+    setBusy(false);
+  };
+
+  return (
+    <main className="ak-login-page">
+      <style>{LOGIN_ONLY_CSS + `
+        .ak-login-shell{position:relative;z-index:5;width:min(520px,calc(100vw - 34px));}
+        .ak-login-company{text-align:center;margin-bottom:26px;animation:akCompanyIn .8s ease both}
+        .ak-login-company h1{margin:0;color:#f5f8f4;font-size:30px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+        .ak-login-company p{margin:8px 0 0;color:#80958a;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+        .ak-login-card{width:100%;padding:32px;}
+        .ak-login-brand{margin-bottom:22px}
+        .ak-login-brand-mark{width:54px;height:54px;border-radius:16px}
+        .ak-login-heading{margin-bottom:22px}.ak-login-heading h1{font-size:25px}.ak-login-heading p{font-size:14px}
+        .ak-login-roles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+        .ak-login-role{border:1px solid #2b4036;background:#0a1511;color:#a7b8af;border-radius:13px;padding:13px 10px;cursor:pointer;transition:.2s ease;font:800 13px inherit}
+        .ak-login-role:hover{transform:translateY(-1px);border-color:#58715f;color:#e8f0ea}
+        .ak-login-role.active{background:rgba(201,239,106,.10);border-color:#c9ef6a;color:#c9ef6a;box-shadow:0 0 0 3px rgba(201,239,106,.05)}
+        .ak-login-role small{display:block;margin-top:4px;font-size:10px;font-weight:600;color:inherit;opacity:.7}
+        @keyframes akCompanyIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+        @media(max-width:560px){.ak-login-company h1{font-size:24px}.ak-login-card{padding:26px 20px}}
+      `}</style>
+      <div className="ak-login-grid" />
+      <div className="ak-login-orb a" />
+      <div className="ak-login-orb b" />
+      <div className="ak-login-orb c" />
+
+      <div className="ak-login-shell">
+        <div className="ak-login-company">
+          <h1>AL KANZ UPHOLSTERY</h1>
+          <p>Workshop Management</p>
+        </div>
+
+        <form className="ak-login-card" onSubmit={submit}>
+          <div className="ak-login-brand">
+            <div className="ak-login-brand-mark"><Sofa size={25} /></div>
+          </div>
+
+          <div className="ak-login-heading">
+            <h1>Welcome</h1>
+            <p>Choose your account to continue</p>
+          </div>
+
+          <div className="ak-login-roles">
+            <button type="button" className={`ak-login-role ${selectedRole === "owner" ? "active" : ""}`} onClick={() => chooseRole("owner")}>
+              Owner
+              <small>Full access</small>
+            </button>
+            <button type="button" className={`ak-login-role ${selectedRole === "staff" ? "active" : ""}`} onClick={() => chooseRole("staff")}>
+              Staff
+              <small>Billing · Materials · Reports</small>
+            </button>
+          </div>
+
+          <div className="ak-login-fields">
+            <label>
+              <span>{selectedRole === "owner" ? "Owner username" : "Staff username"}</span>
+              <div className="ak-login-input">
+                <UserRound size={20} />
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" autoComplete="username" autoFocus />
+              </div>
+            </label>
+
+            <label>
+              <span>Password</span>
+              <div className="ak-login-input">
+                <LockKeyhole size={20} />
+                <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" autoComplete="current-password" />
+                <button type="button" className="ak-login-eye" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"}>
+                  {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+                </button>
+              </div>
+            </label>
+          </div>
+
+          {error && <div className="ak-login-error">{error}</div>}
+
+          <button className="ak-login-button" type="submit" disabled={busy}>
+            <span>{busy ? "Signing in…" : `Sign in as ${selectedRole === "owner" ? "Owner" : "Staff"}`}</span>
+            {!busy && <span className="ak-login-button-arrow">→</span>}
+          </button>
+        </form>
+      </div>
+    </main>
+  );
+}
+
 function App() {
+  const [sessionUser, setSessionUser] = useState(null);
+  const [role, setRole] = useState("staff");
+  const [authLoading, setAuthLoading] = useState(true);
   const [page, setPage] = useState("Dashboard");
   const [jobs, setJobs] = useState(() => loadLocalData().jobs || INITIAL_JOBS);
   const [customers, setCustomers] = useState(() => loadLocalData().customers || INITIAL_CUSTOMERS);
@@ -651,8 +813,23 @@ function App() {
   const [quotations, setQuotations] = useState(() => safeParse(localStorage.getItem("al-kanz-quotations"), []));
 
   useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("al-kanz-session") || "null");
+      if (saved?.user && (saved.role === "owner" || saved.role === "staff")) {
+        setSessionUser(saved.user);
+        setRole(saved.role);
+        setPage(saved.role === "owner" ? "Dashboard" : "Billing");
+      }
+    } catch {
+      localStorage.removeItem("al-kanz-session");
+    } finally {
+      setAuthLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
     const local = loadLocalData();
-    if (!hasSupabase) return;
+    if (!hasSupabase || !sessionUser) return;
 
     const loadRemote = async () => {
       setLoadingData(true);
@@ -674,7 +851,13 @@ function App() {
 
         setJobs((j.data || []).map(mapJob));
         setCustomers((c.data || []).map(mapCustomer));
-        setMaterials((m.data || []).map(mapMaterial));
+        const remoteMaterials = (m.data || []).map(mapMaterial);
+        const remoteMaterialNames = new Set(remoteMaterials.map(x => String(x.name || "").trim().toLowerCase()));
+        const missingProducts = PRODUCT_CATALOG.filter(x => !remoteMaterialNames.has(String(x.name).trim().toLowerCase()));
+        setMaterials([...missingProducts, ...remoteMaterials]);
+        if (missingProducts.length) {
+          Promise.all(missingProducts.map(product => supabase.from("materials").insert(product))).catch(error => console.error("Product catalogue seed failed:", error));
+        }
         setSuppliers((s.data || []).map(mapSupplier));
         setStaff((st.data || []).map(mapStaff));
         setPayments(p.data || []);
@@ -691,7 +874,7 @@ function App() {
       }
     };
     loadRemote();
-  }, []);
+  }, [sessionUser]);
 
   useEffect(() => {
     const data = { jobs, customers, materials, suppliers, staff, payments, expenses, transfers, transactions, auditLogs };
@@ -705,6 +888,34 @@ function App() {
   useEffect(() => {
     localStorage.setItem("al-kanz-quotations", JSON.stringify(quotations));
   }, [quotations]);
+
+  const ownerNavigation = NAVIGATION;
+  const staffNavigation = NAVIGATION.map(group => ({
+    ...group,
+    items: group.items.filter(item => ["Materials", "Billing", "Reports"].includes(item.name))
+  })).filter(group => group.items.length);
+  const visibleNavigation = role === "owner" ? ownerNavigation : staffNavigation;
+  const ownerQuickNav = QUICK_NAV;
+  const staffQuickNav = [
+    { name: "Billing", icon: Receipt },
+    { name: "Materials", icon: Package },
+    { name: "Reports", icon: BarChart3 },
+  ];
+  const visibleQuickNav = role === "owner" ? ownerQuickNav : staffQuickNav;
+  const allowedStaffPages = new Set(["Billing","Main","Transactions","Invoices","Payments","Materials","Reports"]);
+
+  const handleLogin = ({ user, role: nextRole }) => {
+    setSessionUser(user);
+    setRole(nextRole);
+    setPage(nextRole === "owner" ? "Dashboard" : "Billing");
+  };
+
+  const handleLogout = async () => {
+    localStorage.removeItem("al-kanz-session");
+    setSessionUser(null);
+    setRole("staff");
+    setPage("Billing");
+  };
 
   const totalSales = jobs.reduce(
   (a, b) => a + Number(b.amount || 0),
@@ -743,6 +954,7 @@ const netCash = totalPaid - totalExpenses;
   };
 
   const navigate = (name) => {
+    if (role === "staff" && !allowedStaffPages.has(name)) { setPage("Billing"); return; }
     setPage(name);
     setSidebarOpen(false);
 
@@ -925,6 +1137,21 @@ const netCash = totalPaid - totalExpenses;
     auditLocal(editing ? "Updated staff member" : "Created staff member", "staff", record.id, { name: record.name });
   };
 
+  const saveMaterial = async (material) => {
+    const editing = Boolean(material.id);
+    const record = { ...material, id: material.id || Date.now(), stock: Number(material.stock || 0), price: Number(material.price || 0) };
+    setMaterials(prev => editing ? prev.map(x => String(x.id) === String(record.id) ? { ...x, ...record } : x) : [record, ...prev]);
+    setModal(null);
+    if (hasSupabase) {
+      try {
+        const payload = { name: record.name, category: record.category, unit: record.unit, stock: record.stock, price: record.price };
+        const result = editing ? await supabase.from("materials").update(payload).eq("id", record.id) : await supabase.from("materials").insert(payload);
+        if (result.error) throw result.error;
+      } catch (error) { console.error("Material save failed", error); alert(editing ? "Material updated locally, but cloud sync failed." : "Material saved locally, but cloud sync failed."); }
+    }
+    auditLocal(editing ? "Updated material" : "Created material", "material", record.id, { name: record.name });
+  };
+
   const editEntity = (type, record) => {
     setEntityPreview(null);
     setModal({ type, record });
@@ -966,6 +1193,11 @@ const netCash = totalPaid - totalExpenses;
     return results;
   }, [search, jobs, customers, quotations, transactions]);
 
+  // Authentication returns must stay after every hook in App().
+  // Otherwise React sees a different hook order after login.
+  if (authLoading) return <div className="auth-loading"><div className="auth-spinner"/><span>Loading Al Kanz…</span></div>;
+  if (!sessionUser) return <LoginScreen onLogin={handleLogin} />;
+
   return (
     <>
       <style>{FINAL_CSS}</style>
@@ -1006,7 +1238,7 @@ const netCash = totalPaid - totalExpenses;
           </div>
 
           <div className="nav-scroll">
-            {NAVIGATION.map((group) => (
+            {visibleNavigation.map((group) => (
               <div className="nav-group" key={group.section}>
                 <div className="nav-section-title">
                   {group.section}
@@ -1093,14 +1325,14 @@ const netCash = totalPaid - totalExpenses;
               </div>
 
               <div>
-                <strong>Al Kanz Upholstery</strong>
-                <span>Owner account</span>
+                <strong>{sessionUser?.name || "Al Kanz Upholstery"}</strong>
+                <span>{role === "owner" ? "Owner account" : "Staff account"}</span>
               </div>
 
               <MoreHorizontal size={16} />
             </div>
 
-            <button type="button" className="logout" onClick={() => { setAdminMenuOpen(false); setSidebarOpen(false); alert("Demo mode: logout is not connected to authentication yet."); }}>
+            <button type="button" className="logout" onClick={() => { setAdminMenuOpen(false); setSidebarOpen(false); handleLogout(); }}>
               <LogOut size={14} />
               Logout
             </button>
@@ -1233,8 +1465,8 @@ const netCash = totalPaid - totalExpenses;
                 >
                   <div>AK</div>
                   <section>
-                    <strong>Admin</strong>
-                    <span>Owner</span>
+                    <strong>{role === "owner" ? "Owner" : (sessionUser?.name || "Staff")}</strong>
+                    <span>{role === "owner" ? "Full access" : "Staff access"}</span>
                   </section>
                   <ChevronDown
                     size={14}
@@ -1280,7 +1512,7 @@ const netCash = totalPaid - totalExpenses;
           <nav className="quick-nav" aria-label="Quick navigation">
             <div className="quick-nav-inner">
               <span className="quick-nav-label">QUICK NAV</span>
-              {QUICK_NAV.map(({ name, icon: Icon }) => (
+              {visibleQuickNav.map(({ name, icon: Icon }) => (
                 <button
                   type="button"
                   key={name}
@@ -1296,7 +1528,7 @@ const netCash = totalPaid - totalExpenses;
           </nav>
 
           <div className="mobile-bottom-nav" aria-label="Mobile navigation">
-            {QUICK_NAV.slice(0, 5).map(({ name, icon: Icon }) => (
+            {visibleQuickNav.slice(0, 5).map(({ name, icon: Icon }) => (
               <button
                 type="button"
                 key={name}
@@ -1336,6 +1568,7 @@ const netCash = totalPaid - totalExpenses;
                 jobs={filteredJobs}
                 navigate={navigate}
                 setModal={setModal}
+                onEdit={(record) => editEntity("material", record)}
               />
             )}
 
@@ -1385,6 +1618,10 @@ const netCash = totalPaid - totalExpenses;
                 setQuotations={setQuotations}
                 jobs={jobs}
               />
+            )}
+
+            {page === "Quotation Performance" && role === "owner" && (
+              <QuotationPerformancePage quotations={quotations} jobs={jobs} navigate={navigate} />
             )}
 
             {(page === "Billing" ||
@@ -1479,21 +1716,8 @@ const netCash = totalPaid - totalExpenses;
           />
         )}
 
-        {modal === "material" && (
-          <MaterialModal
-            close={() => setModal(null)}
-            save={(material) => {
-              const newMaterial = { ...material, id: Date.now() };
-              setMaterials((prev) => [newMaterial, ...prev]);
-              if (hasSupabase) {
-                supabase.from("materials").insert({ name: material.name, category: material.category, unit: material.unit, stock: material.stock, price: material.price }).then(({ error }) => {
-                  if (error) { console.error(error); alert("Material saved locally, but cloud sync failed."); }
-                });
-              }
-              auditLocal("Created material", "material", newMaterial.id, { name: material.name });
-              setModal(null);
-            }}
-          />
+        {(modal === "material" || modal?.type === "material") && (
+          <MaterialModal close={() => setModal(null)} save={saveMaterial} initial={modal?.record} />
         )}
 
         {(modal === "supplier" || modal?.type === "supplier") && (
@@ -1595,7 +1819,7 @@ function Dashboard({
           <div className="dashboard-action-list">
             <QuickAction icon={ReceiptText} title="Create Bill" subtitle="Bill a particular upholstery item" onClick={() => navigate("Billing")} />
             <QuickAction icon={Plus} title="New Job" subtitle="Add a customer upholstery job" onClick={() => setModal("job")} />
-            <QuickAction icon={Users} title={initial ? "Edit Customer" : "Add Customer"} subtitle="Save a new customer profile" onClick={() => setModal("customer")} />
+            <QuickAction icon={Users} title="Add Customer" subtitle="Save a new customer profile" onClick={() => setModal("customer")} />
             <QuickAction icon={Package} title="Add Material" subtitle="Update workshop inventory" onClick={() => setModal("material")} />
           </div>
           <div className="action-link-row">
@@ -2323,17 +2547,18 @@ function MaterialsPage({
   materials,
   setMaterials,
   setModal,
+  onEdit,
 }) {
   return (
     <>
       <PageTitle
-        eyebrow="WORKSHOP"
-        title="Materials"
-        subtitle="Track leather, fabric, foam and workshop materials."
-        button="Add Material"
+        eyebrow="WORKSHOP INVENTORY"
+        title="Materials & Products"
+        subtitle="Manage upholstery materials and finished products such as chairs, beds and sofas."
+        button="Add Material / Product"
         onClick={() => setModal("material")}
       />
-
+      <div className="inventory-toolbar"><span><Package size={16}/> {materials.length} catalogue items</span><span>Use any item directly in Billing</span></div>
       <div className="material-grid">
         {materials.map((material) => (
           <div className="material-card" key={material.id}>
@@ -2342,7 +2567,7 @@ function MaterialsPage({
             </div>
 
             <div className="material-info">
-              <span>{material.category}</span>
+              <span>{material.product ? "PRODUCT" : material.category}</span>
               <h3>{material.name}</h3>
               <p>
                 AED {material.price} / {material.unit}
@@ -2360,18 +2585,10 @@ function MaterialsPage({
               <span>{material.unit}s</span>
             </div>
 
-            <button
-              className="delete-small"
-              onClick={() =>
-                setMaterials((prev) =>
-                  prev.filter(
-                    (x) => x.id !== material.id
-                  )
-                )
-              }
-            >
-              <Trash2 size={14} />
-            </button>
+            <div className="material-card-actions">
+              <button type="button" className="icon-action" title="Edit material" onClick={() => onEdit?.(material)}><Edit3 size={15} /></button>
+              <button type="button" className="delete-small" onClick={() => setMaterials((prev) => prev.filter((x) => x.id !== material.id))}><Trash2 size={14} /></button>
+            </div>
           </div>
         ))}
       </div>
@@ -2471,6 +2688,7 @@ function BillingPage({
 
   const invoices = safeJobs.map((job) => ({
     ...job,
+    jobId: job.id,
     id: job.invoice_id || `INV-${String(job.id).replace("AK-", "")}`,
     customer: job.customer || "Customer",
     items: Array.isArray(job.items) && job.items.length
@@ -2500,6 +2718,7 @@ function BillingPage({
   const [payment, setPayment] = useState("");
   const [saving, setSaving] = useState(false);
   const [showBillBuilder, setShowBillBuilder] = useState(false);
+  const [editingBill, setEditingBill] = useState(null);
   const [postPrintBill, setPostPrintBill] = useState(null);
   const [customerSearch, setCustomerSearch] = useState("");
   const [billForm, setBillForm] = useState({
@@ -2515,9 +2734,8 @@ function BillingPage({
     paid: "0",
     paymentMethod: "Cash",
   });
-  const [billItems, setBillItems] = useState([
-    { id: Date.now(), materialId: "", item: "", description: "", quantity: "1", unitPrice: "" },
-  ]);
+  const blankBillItems = () => Array.from({ length: 6 }, (_, index) => ({ id: `${Date.now()}-${index}-${Math.random()}`, materialId: "", item: "", description: "", quantity: "1", unitPrice: "" }));
+  const [billItems, setBillItems] = useState(blankBillItems);
 
   const resetBillForm = () => {
     setBillForm({
@@ -2533,12 +2751,23 @@ function BillingPage({
       paid: "0",
       paymentMethod: "Cash",
     });
-    setBillItems([{ id: Date.now(), materialId: "", item: "", description: "", quantity: "1", unitPrice: "" }]);
+    setBillItems(blankBillItems());
     setCustomerSearch("");
+    setEditingBill(null);
   };
 
   const openBillBuilder = () => {
     resetBillForm();
+    setShowBillBuilder(true);
+  };
+
+  const openBillEditor = (bill) => {
+    setEditingBill(bill);
+    setBillForm({ customerId: String(bill.customerId || ""), customer: bill.customer || "", phone: bill.phone || "", whatsapp: bill.whatsapp || "", email: bill.email || "", address: bill.address || "", quotationId: bill.quotationId || "", discount: String(bill.discount || 0), vat: String(bill.vatRate ?? 5), paid: String(bill.paid || 0), paymentMethod: bill.paymentMethod || "Cash" });
+    const rows = (Array.isArray(bill.items) ? bill.items : []).map((item, index) => ({ id: `edit-${bill.id}-${index}`, materialId: item.materialId || "", item: item.item || "", description: item.description || "", quantity: String(item.quantity ?? 1), unitPrice: String(item.unitPrice ?? 0) }));
+    setBillItems(rows.length ? rows : blankBillItems());
+    setCustomerSearch(bill.customer || "");
+    setSelected(null);
     setShowBillBuilder(true);
   };
 
@@ -2562,13 +2791,6 @@ function BillingPage({
       address: customer.address || customer.location || "",
     }));
     setCustomerSearch(customer.name || "");
-  };
-
-  const addItem = () => {
-    setBillItems((items) => [
-      ...items,
-      { id: Date.now() + Math.random(), materialId: "", item: "", description: "", quantity: "1", unitPrice: "" },
-    ]);
   };
 
   const updateItem = (index, key, value) => {
@@ -2635,7 +2857,7 @@ function BillingPage({
   const collectionRate = collectionBase > 0 ? Math.min(100, (Number(totalPaid || 0) / collectionBase) * 100) : 0;
 
   const buildBill = () => {
-    const id = `INV-${String(Date.now()).slice(-8)}`;
+    const id = editingBill?.id || `INV-${String(Date.now()).slice(-8)}`;
     const items = billItems
       .filter((item) => item.item.trim() || Number(item.unitPrice || 0) > 0)
       .map((item) => ({
@@ -2677,12 +2899,12 @@ function BillingPage({
       material: items.map((item) => item.item).join(", "),
       progress: 100,
       invoice_type: "invoice",
+      jobId: editingBill?.jobId || editingBill?.id || "",
     };
   };
 
   const createBill = async (shouldPrint = false) => {
     if (saving) return;
-    if (!billForm.customer.trim()) return alert("Please search and select a customer, or enter a customer name.");
     if (!billItems.some((item) => item.item.trim() && Number(item.unitPrice || 0) > 0)) return alert("Add at least one item with a unit price greater than 0.");
 
     setSaving(true);
@@ -2691,7 +2913,7 @@ function BillingPage({
     try {
       let customerId = bill.customerId || null;
 
-      if (hasSupabase) {
+      if (hasSupabase && bill.customer.trim()) {
         if (!customerId && bill.phone) {
           const existing = await supabase.from("customers").select("id").eq("phone", bill.phone).limit(1).maybeSingle();
           customerId = existing.data?.id || null;
@@ -2746,10 +2968,12 @@ function BillingPage({
           invoice_type: "invoice",
         };
 
-        const saved = await supabase.from("jobs").insert(jobRow).select("*").single();
+        const saved = editingBill?.jobId
+          ? await supabase.from("jobs").update(jobRow).eq("id", editingBill.jobId).select("*").single()
+          : await supabase.from("jobs").insert(jobRow).select("*").single();
         if (saved.error) throw saved.error;
 
-        if (paidNow > 0) {
+        if (!editingBill && paidNow > 0) {
           const paymentRow = await supabase.from("payments").insert({
             job_id: saved.data.id,
             customer_id: customerId,
@@ -2782,13 +3006,16 @@ function BillingPage({
         });
       }
 
-      setJobs?.((items) => [bill, ...(Array.isArray(items) ? items : [])]);
-      if (paidNow > 0) {
+      setJobs?.((items) => editingBill
+        ? (Array.isArray(items) ? items.map(item => String(item.id || item.jobId || item.invoice_id) === String(editingBill.jobId || editingBill.id) ? { ...item, ...bill } : item) : [bill])
+        : [bill, ...(Array.isArray(items) ? items : [])]);
+      if (!editingBill && paidNow > 0) {
         setPayments?.((items) => [{ id: `PAY-${Date.now()}`, bill_id: bill.id, job_id: bill.id, customer: bill.customer, amount: paidNow, payment_method: bill.paymentMethod, paid_at: bill.date }, ...(Array.isArray(items) ? items : [])]);
         setTransactions?.((items) => [{ id: `TX-${Date.now()}`, transaction_type: "Income", description: `Invoice · ${bill.customer} · ${bill.id}`, amount: paidNow, account: bill.paymentMethod, transaction_date: bill.date }, ...(Array.isArray(items) ? items : [])]);
       }
 
       setShowBillBuilder(false);
+      setEditingBill(null);
       setSelected(bill);
       setPostPrintBill(bill);
       resetBillForm();
@@ -2901,32 +3128,35 @@ function BillingPage({
   );
 
   return (
-    <>
+    <div className="billing-root">
       <PageTitle eyebrow="BILLING · UAE" title={page === "Billing" ? "Billing" : page} subtitle="Create, save, print and share professional invoices." />
 
       {page === "Billing" && (
         <>
           <div className="billing-action-strip">
-            <div><span>INVOICE CENTER</span><strong>Fast multi-item billing</strong><small>Search customers and select saved materials. Prices fill automatically.</small></div>
-            <button type="button" className="primary-button" onClick={openBillBuilder}><Plus size={15} /> New Bill</button>
+            <div><span>INVOICE CENTER</span><strong>Professional billing workspace</strong><small>Search a saved customer, edit any bill, link quotations and keep every amount visible.</small></div>
+            <button type="button" className="primary-button" onClick={openBillBuilder}><Plus size={16} /> New Bill</button>
           </div>
-          <div className="quotation-performance-bar">
-            <div><small>QUOTATION PERFORMANCE</small><strong>{quotationStats.approved}/{quotationStats.total} approved</strong></div>
-            <div><span>Quoted value</span><strong>{money(quotationStats.value)}</strong></div>
-            <div><span>Approval rate</span><strong>{quotationStats.total ? Math.round(quotationStats.approved / quotationStats.total * 100) : 0}%</strong></div>
+          <div className="quotation-performance-bar billing-quotation-bar">
+            <div><small>QUOTATION PERFORMANCE</small><strong>{safeQuotations.filter(q => ["Approved","Accepted","Converted"].includes(q.status)).length}/{safeQuotations.length} approved</strong></div>
+            <div><span>Quoted value</span><strong>{money(safeQuotations.reduce((sum,q)=>sum+Number(q.amount||0),0))}</strong></div>
+            <div><span>Approval rate</span><strong>{safeQuotations.length ? Math.round(safeQuotations.filter(q => ["Approved","Accepted","Converted"].includes(q.status)).length / safeQuotations.length * 100) : 0}%</strong></div>
+            <div><span>Open Quotations</span><strong>{safeQuotations.filter(q => !["Approved","Accepted","Converted","Rejected"].includes(q.status)).length}</strong></div>
           </div>
-          <div className="billing-machine">
-            <div className="billing-machine-screen">
-              <div className="machine-topline"><span>AL KANZ BILLING TERMINAL</span><b><i /> ONLINE</b></div>
-              <div className="machine-main">
-                <div className="bill-create-panel"><small>COLLECTED</small><strong>{money(totalPaid)}</strong><span>{invoices.length} invoices · {money(outstanding)} outstanding</span><button type="button" className="create-bill-button" onClick={openBillBuilder}><ReceiptText size={15} /> Create &amp; Print Bill</button></div>
-                <div className="machine-ring" style={{ "--billing-progress": `${collectionRate}%` }}><div><b>{Math.round(collectionRate)}%</b><span>collected</span></div></div>
-              </div>
-            </div>
+          <div className="billing-kpi-grid">
+            <div><small>INVOICES</small><strong>{invoices.length}</strong><span>Saved bills</span></div>
+            <div><small>COLLECTED</small><strong>{money(totalPaid)}</strong><span>Payments received</span></div>
+            <div><small>OUTSTANDING</small><strong>{money(outstanding)}</strong><span>Balance due</span></div>
+            <div><small>COLLECTION</small><strong>{Math.round(collectionRate)}%</strong><span>Paid vs billed</span></div>
+          </div>
+          <div className="billing-table-card">
+            <div className="billing-table-title"><div><span className="eyebrow">SAVED BILLS</span><h3>Invoices · view · edit</h3></div><button type="button" className="secondary-button" onClick={openBillBuilder}><Plus size={15}/> New bill</button></div>
+            <div className="billing-list-head"><span>INVOICE</span><span>CUSTOMER</span><span>TOTAL</span><span>PAID</span><span>BALANCE</span><span>STATUS</span><span>ACTION</span></div>
+            {invoices.map(invoice => <div className="billing-list-row" key={invoice.id}><strong>{invoice.id}</strong><span>{invoice.customer || "Walk-in customer"}</span><strong>{money(invoice.total)}</strong><span>{money(invoice.paid)}</span><span>{money(invoice.balance)}</span><Status status={invoice.status}/><div className="billing-row-actions"><button type="button" className="icon-action" title="Edit bill" onClick={()=>openBillEditor(invoice)}><Edit3 size={18}/></button><button type="button" className="icon-action" title="View invoice" onClick={()=>setSelected(invoice)}><Eye size={18}/></button></div></div>)}
+            {!invoices.length && <EmptyState icon={ReceiptText} title="No bills yet" text="Create your first professional invoice." />}
           </div>
         </>
       )}
-
       {page !== "Billing" && (
         <div className="table-card">
           <div className="table-head"><span>INVOICE</span><span>CUSTOMER</span><span>ITEMS</span><span>AMOUNT</span><span>PAID</span><span>BALANCE</span><span>STATUS</span><span /></div>
@@ -2938,60 +3168,33 @@ function BillingPage({
 
       {showBillBuilder && (
         <div className="modal-backdrop bill-builder-backdrop">
-          <div className="bill-builder-modal bill-builder-modern">
+          <div className="bill-builder-modal bill-builder-modern bill-builder-clean">
             <div className="bill-builder-head">
-              <div><span className="eyebrow">AL KANZ · NEW INVOICE</span><h2>Create &amp; Print Bill</h2><p>Search the customer, choose saved materials, add unlimited items, link a quotation, then save.</p></div>
-              <button type="button" className="job-drawer-close" onClick={() => setShowBillBuilder(false)}><X size={19} /></button>
+              <div><span className="eyebrow">AL KANZ · {editingBill ? "EDIT INVOICE" : "NEW INVOICE"}</span><h2>{editingBill ? "Edit Bill" : "Create Bill"}</h2><p>Customer name is optional. All billing values are editable in one clear workspace.</p></div>
+              <button type="button" className="job-drawer-close" onClick={()=>{setShowBillBuilder(false);setEditingBill(null);}}><X size={20}/></button>
             </div>
-
             <div className="bill-builder-grid">
               <div className="bill-form-pane">
-                <div className="bill-section-title"><span>01</span><div><strong>Customer</strong><small>Search by name, phone, WhatsApp or email.</small></div></div>
-                <label className="field"><span>Search saved customer</span><input autoFocus value={customerSearch} onChange={(event) => setCustomerSearch(event.target.value)} placeholder="Start typing a customer name..." /></label>
-                {filteredCustomers.length > 0 && <div className="customer-search-results">{filteredCustomers.map((customer) => <button type="button" key={customer.id} className="customer-search-option" onClick={() => selectCustomer(customer)}><span className="customer-search-avatar">{String(customer.name || "C").split(" ").map((part) => part[0]).join("").slice(0,2).toUpperCase()}</span><span><strong>{customer.name || customer.company}</strong><small>{customer.phone || "No phone"} · {customer.email || "No email"}</small></span><ChevronRight size={15} /></button>)}</div>}
-                <div className="bill-fields two"><label className="field"><span>Customer *</span><input value={billForm.customer} onChange={(event) => setBillForm((form) => ({ ...form, customer:event.target.value }))} /></label><label className="field"><span>Phone</span><input value={billForm.phone} onChange={(event) => setBillForm((form) => ({ ...form, phone:event.target.value }))} /></label></div>
-                <div className="bill-fields two"><label className="field"><span>WhatsApp</span><input value={billForm.whatsapp} onChange={(event) => setBillForm((form) => ({ ...form, whatsapp:event.target.value }))} /></label><label className="field"><span>Email</span><input type="email" value={billForm.email} onChange={(event) => setBillForm((form) => ({ ...form, email:event.target.value }))} /></label></div>
-                <label className="field"><span>Address</span><input value={billForm.address} onChange={(event) => setBillForm((form) => ({ ...form, address:event.target.value }))} /></label>
-
-                <div className="bill-fields two">
-                  <label className="field"><span>Related quotation</span><select value={billForm.quotationId} onChange={(event) => applyQuotation(event.target.value)}><option value="">No quotation</option>{safeQuotations.map((quote) => <option key={quote.id} value={quote.id}>{quote.id} · {quote.customer} · {money(quote.amount)}</option>)}</select></label>
-                  <div className="quotation-mini-stat"><small>QUOTATION PERFORMANCE</small><strong>{quotationStats.total ? Math.round(quotationStats.approved / quotationStats.total * 100) : 0}%</strong><span>{quotationStats.approved} approved of {quotationStats.total}</span></div>
+                <div className="bill-section-title"><span>01</span><div><strong>Customer</strong><small>Search a saved customer or type a name. Saved contact details are reused automatically.</small></div></div>
+                <div className="bill-inline-grid customer-inline">
+                  <label className="field"><span>Search customer</span><input autoFocus value={customerSearch} onChange={e=>setCustomerSearch(e.target.value)} placeholder="Search name / phone / email..." /></label>
+                  <label className="field"><span>Customer name <em>(optional)</em></span><input value={billForm.customer} onChange={e=>setBillForm(f=>({...f,customer:e.target.value}))} placeholder="Enter customer name or leave blank" /></label>
                 </div>
-
-                <div className="bill-section-title" style={{ marginTop:22 }}><span>02</span><div><strong>Bill items</strong><small>Pick a saved material to auto-fill its unit price.</small></div><button type="button" className="secondary-button" onClick={addItem}><Plus size={14} /> Add item</button></div>
-                <div className="bill-items-editor">
-                  {billItems.map((item, index) => (
-                    <div className="bill-editor-item" key={item.id}>
-                      <div className="bill-editor-number">{String(index + 1).padStart(2, "0")}</div>
-                      <div className="bill-editor-fields">
-                        <label className="field"><span>Material / service</span><select value={item.materialId} onChange={(event) => selectMaterial(index, event.target.value)}><option value="">Custom item</option>{safeMaterials.map((material) => <option key={material.id} value={material.id}>{material.name} · {money(material.price)} / {material.unit}</option>)}</select></label>
-                        <label className="field"><span>Description</span><input value={item.description} onChange={(event) => updateItem(index, "description", event.target.value)} placeholder="Work / material details" /></label>
-                        <div className="bill-fields three"><label className="field"><span>Qty</span><input type="number" min="0.01" step="0.01" value={item.quantity} onChange={(event) => updateItem(index, "quantity", event.target.value)} /></label><label className="field"><span>Unit price</span><input type="number" min="0" step="0.01" value={item.unitPrice} onChange={(event) => updateItem(index, "unitPrice", event.target.value)} /></label><label className="field"><span>Amount</span><input value={money(itemTotals[index])} readOnly /></label></div>
-                      </div>
-                      {billItems.length > 1 && <button type="button" className="row-action danger-action" onClick={() => removeItem(index)} title="Remove item"><Trash2 size={15} /></button>}
-                    </div>
-                  ))}
+                {filteredCustomers.length > 0 && <div className="customer-search-results">{filteredCustomers.map(customer=><button type="button" key={customer.id} className="customer-search-option" onClick={()=>selectCustomer(customer)}><span className="customer-search-avatar">{String(customer.name||"C").split(" ").map(x=>x[0]).join("").slice(0,2).toUpperCase()}</span><span><strong>{customer.name||customer.company}</strong><small>{customer.phone||"No phone"} · {customer.email||"No email"}</small></span><ChevronRight size={16}/></button>)}</div>}
+                <div className="bill-inline-grid quotation-inline"><label className="field"><span>Related quotation</span><select value={billForm.quotationId} onChange={e=>applyQuotation(e.target.value)}><option value="">No quotation</option>{safeQuotations.map(q=><option key={q.id} value={q.id}>{q.id} · {q.customer||"Customer"} · {money(q.amount)}</option>)}</select></label><div className="linked-info"><span>QUOTATION LINK</span><strong>{billForm.quotationId || "None"}</strong><small>Performance is shown in the Quotations section.</small></div></div>
+                <div className="bill-section-title compact-title"><span>02</span><div><strong>Bill items</strong><small>Each item stays on one line: material, description, quantity, unit price and amount.</small></div></div>
+                <div className="bill-line-editor">
+                  <div className="bill-line-head"><span>#</span><span>Material / service</span><span>Description</span><span>Qty</span><span>Unit price</span><span>Amount</span><span></span></div>
+                  {billItems.map((item,index)=><div className="bill-line-row" key={item.id}><span className="line-number">{String(index+1).padStart(2,"0")}</span><select value={item.materialId} onChange={e=>selectMaterial(index,e.target.value)}><option value="">Custom item</option>{safeMaterials.map(m=><option key={m.id} value={m.id}>{m.name} · {money(m.price)}</option>)}</select><input value={item.item} onChange={e=>updateItem(index,"item",e.target.value)} placeholder="Item / service"/><input value={item.description} onChange={e=>updateItem(index,"description",e.target.value)} placeholder="Description"/><input type="number" min="0.01" step="0.01" value={item.quantity} onChange={e=>updateItem(index,"quantity",e.target.value)} /><input type="number" min="0" step="0.01" value={item.unitPrice} onChange={e=>updateItem(index,"unitPrice",e.target.value)} placeholder="0.00"/><input value={money(itemTotals[index])} readOnly/><button type="button" className="icon-action danger-action" title="Remove item" onClick={()=>setBillItems(items=>items.length>1?items.filter((_,i)=>i!==index):items)}><Trash2 size={15}/></button></div>)}
                 </div>
-
-                <div className="bill-fields three"><label className="field"><span>Discount</span><input type="number" min="0" value={billForm.discount} onChange={(event) => setBillForm((form) => ({ ...form, discount:event.target.value }))} /></label><label className="field"><span>VAT</span><select value={billForm.vat} onChange={(event) => setBillForm((form) => ({ ...form, vat:event.target.value }))}><option value="0">0%</option><option value="5">5%</option></select></label><label className="field"><span>Paid now</span><input type="number" min="0" max={billTotal} value={billForm.paid} onChange={(event) => setBillForm((form) => ({ ...form, paid:event.target.value }))} /></label></div>
-                <label className="field"><span>Payment method</span><select value={billForm.paymentMethod} onChange={(event) => setBillForm((form) => ({ ...form, paymentMethod:event.target.value }))}><option>Cash</option><option>Card</option><option>Bank Transfer</option><option>Credit</option></select></label>
+                <div className="bill-inline-grid finance-inline"><label className="field"><span>Discount (AED)</span><input type="number" min="0" value={billForm.discount} onChange={e=>setBillForm(f=>({...f,discount:e.target.value}))}/></label><label className="field"><span>VAT (%) — custom</span><input type="number" min="0" max="100" step="0.1" value={billForm.vat} onChange={e=>setBillForm(f=>({...f,vat:e.target.value}))}/></label><label className="field"><span>Paid now (AED)</span><input type="number" min="0" max={billTotal} value={billForm.paid} onChange={e=>setBillForm(f=>({...f,paid:e.target.value}))}/></label><label className="field"><span>Payment method</span><select value={billForm.paymentMethod} onChange={e=>setBillForm(f=>({...f,paymentMethod:e.target.value}))}><option>Cash</option><option>Card</option><option>Bank Transfer</option><option>Credit</option></select></label></div>
+                <div className="bill-form-actions"><button type="button" className="secondary-button" onClick={()=>{setShowBillBuilder(false);setEditingBill(null);}}><X size={16}/> Cancel</button><button type="button" className="secondary-button" disabled={saving} onClick={()=>createBill(false)}><Save size={16}/>{saving?"Saving…":editingBill?"Update Bill":"Save Bill"}</button><button type="button" className="primary-button" disabled={saving} onClick={()=>createBill(true)}><Printer size={16}/>{saving?"Saving…":editingBill?"Update & Print":"Save & Print"}</button></div>
               </div>
-
-              <div className="bill-preview-pane">
-                <div className="invoice-preview">
-                  <div className="invoice-brand"><div><strong>AL KANZ</strong><span>UPHOLSTERY</span></div><b>TAX INVOICE</b></div>
-                  <div className="invoice-preview-meta"><div><small>BILL TO</small><strong>{billForm.customer || "Customer name"}</strong><span>{billForm.phone || billForm.email || "Contact details"}</span><span>{billForm.address || "Dubai, UAE"}</span></div><div><small>DATE</small><strong>{new Date().toLocaleDateString("en-AE")}</strong><span>{billForm.quotationId ? `Quote ${billForm.quotationId}` : "New invoice"}</span></div></div>
-                  <div className="invoice-preview-items">{billItems.filter((item) => item.item || item.unitPrice).map((item, index) => <div className="invoice-item-preview" key={item.id}><div><small>{String(index + 1).padStart(2, "0")} · DESCRIPTION</small><strong>{item.item || "Item"}</strong><span>{item.description || "Upholstery service"}</span></div><strong>{money(itemTotals[index])}</strong></div>)}</div>
-                  <div className="invoice-totals"><span>Subtotal <b>{money(subtotal)}</b></span><span>Discount <b>- {money(discountAmount)}</b></span><span>VAT ({billForm.vat}%) <b>{money(vatAmount)}</b></span><strong>Total <b>{money(billTotal)}</b></strong><span>Paid now <b>{money(paidNow)}</b></span><span>Balance <b>{money(billBalance)}</b></span></div>
-                  <div className="invoice-note">Thank you for choosing <b>Al Kanz Upholstery</b>. This invoice will be saved to the workshop database.</div>
-                </div>
-                <div className="bill-preview-actions"><button type="button" className="secondary-button" disabled={saving} onClick={() => createBill(false)}><Save size={16} /> {saving ? "Saving…" : "Save Bill"}</button><button type="button" className="primary-button" disabled={saving} onClick={() => createBill(true)}><Printer size={16} /> {saving ? "Creating…" : "Create & Print Bill"}</button></div>
-              </div>
+              <div className="bill-preview-pane"><div className="invoice-preview"><div className="invoice-brand"><div><strong>AL KANZ</strong><span>UPHOLSTERY</span></div><b>TAX INVOICE</b></div><div className="invoice-preview-meta"><div><small>BILL TO</small><strong>{billForm.customer||"Walk-in customer"}</strong><span>{billForm.phone||billForm.email||"No contact details"}</span><span>{billForm.address||"Dubai, UAE"}</span></div><div><small>DATE</small><strong>{new Date().toLocaleDateString("en-AE")}</strong><span>{billForm.quotationId?`Quote ${billForm.quotationId}`:"No quotation"}</span></div></div><div className="invoice-preview-items">{billItems.map((item,index)=>item.item||item.unitPrice?<div className="invoice-item-preview" key={item.id}><div><small>{String(index+1).padStart(2,"0")} · ITEM</small><strong>{item.item||"Item"}</strong><span>{item.description||"Upholstery service"} · {item.quantity} × {money(item.unitPrice)}</span></div><strong>{money(itemTotals[index])}</strong></div>:null)}</div><div className="invoice-totals"><span>Subtotal <b>{money(subtotal)}</b></span><span>Discount <b>- {money(discountAmount)}</b></span><span>VAT ({billForm.vat}%) <b>{money(vatAmount)}</b></span><strong>Total <b>{money(billTotal)}</b></strong><span>Paid now <b>{money(paidNow)}</b></span><span>Balance <b>{money(billBalance)}</b></span></div></div></div>
             </div>
           </div>
         </div>
       )}
-
       {postPrintBill && (
         <div className="modal-backdrop">
           <div className="card post-print-modal">
@@ -3009,7 +3212,7 @@ function BillingPage({
       {selected && (
         <div className="modal-backdrop">
           <div className="invoice-detail-modal">
-            <div className="invoice-detail-toolbar"><div><span className="eyebrow">INVOICE DETAILS</span><strong>{selected.id}</strong></div><button type="button" className="job-drawer-close" onClick={() => setSelected(null)}><X size={20} /></button></div>
+            <div className="invoice-detail-toolbar"><div><span className="eyebrow">INVOICE DETAILS</span><strong>{selected.id}</strong></div><div className="invoice-toolbar-actions"><button type="button" className="secondary-button" onClick={() => openBillEditor(selected)}><Edit3 size={16}/> Edit Bill</button><button type="button" className="job-drawer-close" onClick={() => setSelected(null)}><X size={20} /></button></div></div>
             <InvoicePaper bill={selected} />
             <div className="invoice-contact-card"><div><small>PHONE</small><strong>{selected.phone || "Not saved"}</strong></div><div><small>WHATSAPP</small><strong>{selected.whatsapp || selected.phone || "Not saved"}</strong></div><div><small>EMAIL</small><strong>{selected.email || "Not saved"}</strong></div></div>
             <div className="invoice-share-center"><div className="share-center-head"><div><span className="eyebrow">SEND INVOICE</span><strong>Same invoice · multiple channels</strong><small>WhatsApp opens the saved customer chat. Share PDF uses the device share sheet when supported.</small></div></div><div className="post-print-actions"><button type="button" className="share-btn whatsapp" onClick={() => shareBill(selected, "whatsapp")}><MessageCircle size={17} /> WhatsApp</button><button type="button" className="share-btn" onClick={() => shareBill(selected, "share")}><ReceiptText size={17} /> Share PDF</button><button type="button" className="share-btn" onClick={() => shareBill(selected, "phone")}><Phone size={17} /> Call</button><button type="button" className="share-btn" onClick={() => shareBill(selected, "email")}><Mail size={17} /> Email</button></div></div>
@@ -3019,8 +3222,7 @@ function BillingPage({
       )}
 
       <div className="print-invoice-sheet">{postPrintBill && <InvoicePaper bill={postPrintBill} />}</div>
-    </>
-  );
+    </div> );
 }
 /* ============================================================
    REPORTS
@@ -3268,6 +3470,21 @@ function NotificationSetting({ title, description, checked, onChange }) {
   </button>;
 }
 
+function QuotationPerformancePage({ quotations = [], jobs = [], navigate }) {
+  const list = Array.isArray(quotations) ? quotations : [];
+  const approved = list.filter(q => ["Approved","Accepted","Converted"].includes(q.status)).length;
+  const pending = list.filter(q => !["Approved","Accepted","Converted","Rejected"].includes(q.status)).length;
+  const rejected = list.filter(q => q.status === "Rejected").length;
+  const value = list.reduce((sum,q)=>sum+Number(q.amount||0),0);
+  const conversion = list.length ? Math.round((approved/list.length)*100) : 0;
+  return <>
+    <PageTitle eyebrow="SALES INTELLIGENCE" title="Quotation Performance" subtitle="Track quotation volume, approval rate, pipeline value and conversion." button="All Quotations" onClick={()=>navigate("All Quotations")} />
+    <div className="performance-hero"><div><span>CONVERSION RATE</span><strong>{conversion}%</strong><p>{approved} approved from {list.length} quotations</p></div><div className="performance-ring"><div><strong>{list.length}</strong><span>Total quotes</span></div></div></div>
+    <div className="performance-grid"><ReportBox icon={FileText} title="Total quotations" value={list.length} note="Created estimates"/><ReportBox icon={CheckCircle2} title="Approved" value={approved} note="Won / approved"/><ReportBox icon={Clock3} title="Pending" value={pending} note="Awaiting customer"/><ReportBox icon={CircleDollarSign} title="Quoted value" value={money(value)} note="Total pipeline"/></div>
+    <div className="card performance-table-card"><CardHeader eyebrow="QUOTE PIPELINE" title="Quotation status" subtitle="A clear view of your current sales pipeline."/><div className="performance-status-grid"><div><span>Approved</span><strong>{approved}</strong><i style={{width:`${conversion}%`}}/></div><div><span>Pending</span><strong>{pending}</strong><i style={{width:`${list.length ? Math.round(pending/list.length*100):0}%`}}/></div><div><span>Rejected</span><strong>{rejected}</strong><i style={{width:`${list.length ? Math.round(rejected/list.length*100):0}%`}}/></div></div></div>
+  </>;
+}
+
 function QuotationPage({ page, quotations = [], setQuotations }) {
   const [form, setForm] = useState({
     customer: "",
@@ -3277,12 +3494,12 @@ function QuotationPage({ page, quotations = [], setQuotations }) {
     quantity: "1",
     unitPrice: "",
     validity: "30 days",
-    status: "Draft",
   });
   const [showForm, setShowForm] = useState(page === "New Quotation");
   const [selectedQuote, setSelectedQuote] = useState(null);
   const [printOpen, setPrintOpen] = useState(false);
   const [aiText, setAiText] = useState("");
+  const [editingQuote, setEditingQuote] = useState(null);
 
   const safeQuotations = Array.isArray(quotations) ? quotations : [];
   const subtotal = Number(form.quantity || 0) * Number(form.unitPrice || 0);
@@ -3300,8 +3517,6 @@ function QuotationPage({ page, quotations = [], setQuotations }) {
     setAiText(tips.join(" "));
   };
 
-  const [editingQuote, setEditingQuote] = useState(null);
-
   const save = () => {
     if (!form.customer || !form.item || !form.unitPrice) {
       alert("Customer, item and unit price are required.");
@@ -3316,14 +3531,13 @@ function QuotationPage({ page, quotations = [], setQuotations }) {
       subtotal,
       vat,
       amount: grandTotal,
-      status: form.status || "Draft",
-      date: editingQuote?.date || new Date().toLocaleDateString("en-AE"),
-      updatedAt: new Date().toISOString(),
+      status: editingQuote?.status || "Draft",
+      date: new Date().toLocaleDateString("en-AE"),
     };
     setQuotations(prev => editingQuote ? prev.map(x => x.id === editingQuote.id ? q : x) : [q, ...(Array.isArray(prev) ? prev : [])]);
     setSelectedQuote(q);
     setEditingQuote(null);
-    setForm({customer:"", phone:"", item:"", description:"", quantity:"1", unitPrice:"", validity:"30 days", status:"Draft"});
+    setForm({ customer:"", phone:"", item:"", description:"", quantity:"1", unitPrice:"", validity:"30 days" });
     setShowForm(false);
   };
 
@@ -3337,24 +3551,16 @@ function QuotationPage({ page, quotations = [], setQuotations }) {
         onClick={() => setShowForm(true)}
       />
 
-      <div className="staff-summary-grid quotation-performance-summary">
-        <ReportBox icon={FileText} title="Total quotations" value={safeQuotations.length} note="All saved quotations" />
-        <ReportBox icon={CheckCircle2} title="Approved" value={safeQuotations.filter(q => String(q.status || "").toLowerCase() === "approved").length} note="Accepted quotations" />
-        <ReportBox icon={Clock3} title="Pending" value={safeQuotations.filter(q => !["approved","rejected"].includes(String(q.status || "draft").toLowerCase())).length} note="Awaiting customer decision" />
-        <ReportBox icon={TrendingUp} title="Conversion" value={`${safeQuotations.length ? Math.round((safeQuotations.filter(q => String(q.status || "").toLowerCase() === "approved").length / safeQuotations.length) * 100) : 0}%`} note="Approved / total" />
-      </div>
-
       {showForm && (
         <div className="quotation-invoice-layout">
           <div className="card quotation-form-card">
-            <CardHeader eyebrow="QUOTATION DETAILS" title="Create quotation" subtitle="Demo quotation — prices can be edited before saving." />
+            <CardHeader eyebrow="QUOTATION DETAILS" title={editingQuote ? "Edit quotation" : "Create quotation"} subtitle="Every quotation field can be edited before saving." />
             <div className="settings-form">
               <label>Customer<input value={form.customer} onChange={e=>setForm({...form,customer:e.target.value})} placeholder="Customer name" /></label>
               <label>Phone<input value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} placeholder="+971..." /></label>
               <label>Item / Service<input value={form.item} onChange={e=>setForm({...form,item:e.target.value})} placeholder="Sofa upholstery, car seat, etc." /></label>
               <label>Quantity<input type="number" min="1" value={form.quantity} onChange={e=>setForm({...form,quantity:e.target.value})} /></label>
               <label>Unit Price (AED)<input type="number" min="0" value={form.unitPrice} onChange={e=>setForm({...form,unitPrice:e.target.value})} placeholder="0.00" /></label>
-              <label>Status<select value={form.status} onChange={e=>setForm({...form,status:e.target.value})}><option>Draft</option><option>Sent</option><option>Approved</option><option>Rejected</option></select></label>
               <label>Validity<select value={form.validity} onChange={e=>setForm({...form,validity:e.target.value})}><option>7 days</option><option>15 days</option><option>30 days</option><option>60 days</option></select></label>
               <label className="full-field">Description<textarea value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Work included, materials, terms..." rows="4" /></label>
               <div className="quotation-ai-box full-field">
@@ -3362,7 +3568,7 @@ function QuotationPage({ page, quotations = [], setQuotations }) {
                 <button type="button" className="secondary-button" onClick={runQuotationAI}><Sparkles size={15}/> Help me</button>
                 {aiText && <p>{aiText}</p>}
               </div>
-              <div className="settings-form-actions full-field quotation-action-bar"><button type="button" className="primary-button" onClick={save}><Save size={16}/> Save Quotation</button><button type="button" className="secondary-button" onClick={()=>setPrintOpen(true)}><Printer size={16}/> Print Options</button><button type="button" className="secondary-button" onClick={()=>setShowForm(false)}>Cancel</button></div>
+              <div className="settings-form-actions full-field quotation-action-bar"><button type="button" className="primary-button" onClick={save}><Save size={16}/> {editingQuote ? "Update Quotation" : "Save Quotation"}</button><button type="button" className="secondary-button" onClick={()=>setPrintOpen(true)}><Printer size={16}/> Print Options</button><button type="button" className="secondary-button" onClick={()=>setShowForm(false)}>Cancel</button></div>
             </div>
           </div>
 
@@ -3401,7 +3607,7 @@ function QuotationPage({ page, quotations = [], setQuotations }) {
             <div className="document-parties"><div><small>FROM</small><strong>Al Kanz Upholstery</strong><span>Dubai, UAE</span></div><div><small>TO</small><strong>{selectedQuote.customer}</strong><span>{selectedQuote.phone || "—"}</span></div></div>
             <div className="invoice-items"><div className="invoice-item-head"><span>DESCRIPTION</span><span>QTY</span><span>UNIT PRICE</span><span>TOTAL</span></div><div className="invoice-item-row"><span><strong>{selectedQuote.item}</strong><small>{selectedQuote.description || "—"}</small></span><span>{selectedQuote.quantity}</span><span>{money(selectedQuote.unitPrice)}</span><strong>{money(selectedQuote.subtotal)}</strong></div></div>
             <div className="document-totals"><div><span>Subtotal</span><strong>{money(selectedQuote.subtotal)}</strong></div><div><span>VAT (5%)</span><strong>{money(selectedQuote.vat)}</strong></div><div className="grand"><span>Grand Total</span><strong>{money(selectedQuote.amount)}</strong></div></div>
-            <div className="document-actions"><button className="primary-button" onClick={()=>window.print()}><Printer size={16}/> Print Quotation</button><button className="secondary-button" onClick={()=>setPrintOpen(true)}><SlidersHorizontal size={16}/> Print Options</button><button className="secondary-button" onClick={()=>{ const copy={...selectedQuote,id:`QT-${String(Date.now()).slice(-6)}`,status:"Draft",date:new Date().toLocaleDateString("en-AE")}; setQuotations(prev=>[copy,...prev]); setSelectedQuote(copy); }}><RefreshCw size={16}/> Duplicate</button><button className="secondary-button" onClick={()=>{ setSelectedQuote(null); setShowForm(true); setEditingQuote(selectedQuote); setForm({customer:selectedQuote.customer,phone:selectedQuote.phone||"",item:selectedQuote.item,description:selectedQuote.description||"",quantity:String(selectedQuote.quantity||1),unitPrice:String(selectedQuote.unitPrice||0),validity:selectedQuote.validity||"30 days",status:selectedQuote.status||"Draft"}); }}> <Edit3 size={16}/> Edit</button><button className="secondary-button" onClick={()=>setSelectedQuote(null)}>Close</button></div>
+            <div className="document-actions"><button className="primary-button" onClick={()=>window.print()}><Printer size={16}/> Print Quotation</button><button className="secondary-button" onClick={()=>setPrintOpen(true)}><SlidersHorizontal size={16}/> Print Options</button><button className="secondary-button" onClick={()=>{ const copy={...selectedQuote,id:`QT-${String(Date.now()).slice(-6)}`,status:"Draft",date:new Date().toLocaleDateString("en-AE")}; setQuotations(prev=>[copy,...prev]); setSelectedQuote(copy); }}><RefreshCw size={16}/> Duplicate</button><button className="secondary-button" onClick={()=>{ setSelectedQuote(null); setEditingQuote(selectedQuote); setShowForm(true); setForm({customer:selectedQuote.customer,phone:selectedQuote.phone||"",item:selectedQuote.item,description:selectedQuote.description||"",quantity:String(selectedQuote.quantity||1),unitPrice:String(selectedQuote.unitPrice||0),validity:selectedQuote.validity||"30 days"}); }}> <Edit3 size={16}/> Edit</button><button className="secondary-button" onClick={()=>setSelectedQuote(null)}>Close</button></div>
           </div>
         </div>
       )}
@@ -3463,6 +3669,7 @@ function EntityPreviewModal({ entity, close }) {
     </div>
   </div>;
 }
+
 
 function PrintOptionsModal({ title, close, options = [] }) {
   return <div className="modal-backdrop" onMouseDown={(e)=>{if(e.target===e.currentTarget)close();}}>
@@ -3824,19 +4031,15 @@ function CustomerModal({ close, save, initial }) {
    MATERIAL MODAL
 ============================================================ */
 
-function MaterialModal({ close, save }) {
-  const [form, setForm] = useState({
-    name: "",
-    category: "Leather",
-    unit: "Meter",
-    stock: "",
-    price: "",
+function MaterialModal({ close, save, initial }) {
+  const [form, setForm] = useState(initial || {
+    name: "", category: "Leather", unit: "Meter", stock: "", price: "",
   });
 
   return (
     <Modal
-      title="Add Material"
-      subtitle="Add leather, fabric, foam or another workshop material."
+      title={initial ? "Edit Material" : "Add Material"}
+      subtitle={initial ? "Update the saved material, stock and selling price." : "Add leather, fabric, foam or another workshop material."}
       close={close}
     >
       <form
@@ -3877,6 +4080,7 @@ function MaterialModal({ close, save }) {
               "Fabric",
               "Foam",
               "Accessories",
+              "Furniture",
               "Other",
             ]}
           />
@@ -3895,6 +4099,7 @@ function MaterialModal({ close, save }) {
               "Sheet",
               "Piece",
               "Roll",
+              "Piece",
             ]}
           />
 
@@ -3939,7 +4144,7 @@ function MaterialModal({ close, save }) {
             className="primary-button"
           >
             <Save size={16} />
-            Save Material
+            {initial ? "Update Material" : "Save Material"}
           </button>
         </div>
       </form>
@@ -7986,6 +8191,620 @@ const AL_KANZ_BILL_TEMPLATE_CSS = `
 @media(max-width:700px){.invoice-paper-screen{margin:12px;padding:20px}.bill-template-header,.bill-company-strip{flex-direction:column}.bill-title-block,.bill-party-right{text-align:left}.bill-parties,.bill-bottom-grid{grid-template-columns:1fr}.bill-items-table{overflow-x:auto}.bill-items-head,.bill-items-row{min-width:600px}.bill-template-footer{flex-direction:column}.invoice-contact-card,.invoice-share-center{margin-left:12px;margin-right:12px;padding-left:0;padding-right:0}.invoice-modal-actions{padding-left:12px;padding-right:12px}}
 @media print{.invoice-paper-screen{box-shadow:none;border:0;margin:0;border-radius:0}.invoice-detail-toolbar,.invoice-contact-card,.invoice-share-center,.invoice-modal-actions{display:none!important}}
 `;
-const FINAL_CSS = CSS + AL_KANZ_BILL_TEMPLATE_CSS + AL_KANZ_CRM_DETAIL_CSS + AL_KANZ_PREMIUM_CRM_REPORT_CSS + AL_KANZ_FINAL_RESPONSIVE + AL_KANZ_FINAL_FIX + AL_KANZ_LAST_FIX + AL_KANZ_TRUE_FINAL_FIX + AL_KANZ_FULL_MOTION_CSS + AL_KANZ_LIGHT_UI + BILLING_BUTTON_FIX_CSS;
+
+
+const AL_KANZ_FINAL_UI_CSS = `
+/* FINAL CLIENT UI PASS */
+.app{font-size:15px}.app button,.app input,.app select,.app textarea{font-size:15px}.app .page-title h1{font-size:32px!important}.app .page-title p{font-size:15px!important}.app .eyebrow{font-size:11px!important}.app .field>span{font-size:12px!important;font-weight:800}.app .field input,.app .field select,.app .field textarea{min-height:48px;padding:11px 13px}.app .primary-button,.app .secondary-button{min-height:44px;padding:10px 16px;font-size:14px!important;font-weight:800}.app .card,.app .table-card{border-radius:18px}.app .staff-card-rich,.app .customer-card-premium,.app .supplier-premium-card{padding:22px!important}.app .staff-card-rich h3,.app .customer-card-premium h3,.app .supplier-premium-card h3{font-size:20px!important}.app .staff-contact-lines span,.app .supplier-contact-stack span{font-size:13px!important}.app .staff-metrics strong,.app .staff-salary-box strong{font-size:18px!important}
+
+.billing-action-strip{display:flex;justify-content:space-between;align-items:center;gap:22px;padding:22px 24px;margin-bottom:16px;border:1px solid var(--border);border-radius:18px;background:var(--white);box-shadow:0 8px 28px rgba(18,52,44,.05)}.billing-action-strip>div span{display:block;font-size:11px;font-weight:900;letter-spacing:.13em;color:var(--green)}.billing-action-strip>div strong{display:block;font-size:23px;margin:5px 0}.billing-action-strip>div small{font-size:14px;color:var(--muted)}
+.billing-quotation-bar,.quotation-page-performance{display:grid!important;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:1px;padding:0!important;overflow:hidden;border:1px solid var(--border);border-radius:18px;background:var(--border);margin:0 0 18px}.quotation-performance-bar>div{background:var(--white);padding:17px 19px;min-width:0}.quotation-performance-bar small,.quotation-performance-bar span{display:block;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.08em}.quotation-performance-bar strong{display:block;font-size:23px;margin:4px 0;color:var(--text)}
+.billing-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.billing-kpi-grid>div{padding:20px;border:1px solid var(--border);border-radius:16px;background:var(--white);box-shadow:0 6px 22px rgba(18,52,44,.04)}.billing-kpi-grid small{font-size:11px;font-weight:900;letter-spacing:.12em;color:var(--muted)}.billing-kpi-grid strong{display:block;font-size:25px;margin:7px 0}.billing-kpi-grid span{font-size:13px;color:var(--muted)}
+.billing-table-card{background:var(--white);border:1px solid var(--border);border-radius:18px;overflow:hidden}.billing-table-title{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--border)}.billing-table-title h3{margin:4px 0 0;font-size:20px}.billing-list-head,.billing-list-row{display:grid;grid-template-columns:1.1fr 1.5fr .9fr .9fr .9fr .8fr .75fr;gap:14px;align-items:center;padding:15px 20px}.billing-list-head{background:var(--soft);font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted)}.billing-list-row{min-height:64px;border-top:1px solid var(--border);font-size:14px}.billing-list-row:hover{background:rgba(80,150,125,.04)}.billing-row-actions{display:flex;justify-content:flex-end;gap:7px}.icon-action{width:38px;height:38px;border:1px solid var(--border);border-radius:10px;background:var(--white);display:inline-grid;place-items:center;color:var(--text);cursor:pointer}.icon-action:hover{border-color:var(--green);color:var(--green);transform:translateY(-1px)}.danger-action{color:#b34d4d!important}.invoice-toolbar-actions{display:flex;align-items:center;gap:10px}
+
+.bill-builder-backdrop{padding:18px!important;align-items:center}.bill-builder-modern.bill-builder-clean{width:min(1500px,97vw)!important;max-height:94vh!important;border-radius:24px!important}.bill-builder-clean .bill-builder-head{padding:24px 28px!important}.bill-builder-clean .bill-builder-head h2{font-size:28px!important}.bill-builder-clean .bill-builder-head p{font-size:14px!important}.bill-builder-clean .bill-builder-grid{grid-template-columns:minmax(0,1.65fr) minmax(350px,.75fr)!important;min-height:0}.bill-form-pane{padding:24px 28px!important}.bill-preview-pane{padding:24px!important;background:var(--soft)}.bill-section-title{margin-bottom:14px!important}.bill-section-title>span{width:34px!important;height:34px!important;font-size:13px!important}.bill-section-title strong{font-size:18px!important}.bill-section-title small{font-size:13px!important}.bill-inline-grid{display:grid;gap:14px;align-items:end}.customer-inline{grid-template-columns:1fr 1fr}.quotation-inline{grid-template-columns:1.25fr 1fr;margin-top:14px}.finance-inline{grid-template-columns:repeat(4,1fr);margin-top:18px}.linked-info{height:48px;border:1px solid var(--border);border-radius:10px;background:var(--soft);padding:8px 12px;display:flex;flex-direction:column;justify-content:center}.linked-info span{font-size:10px;font-weight:900;letter-spacing:.08em;color:var(--muted)}.linked-info strong{font-size:14px}.linked-info small{font-size:11px;color:var(--muted)}.field em{font-style:normal;color:var(--muted);font-weight:600}
+.bill-line-editor{border:1px solid var(--border);border-radius:14px;overflow:auto;background:var(--white)}.bill-line-head,.bill-line-row{display:grid;grid-template-columns:34px minmax(170px,1.3fr) minmax(150px,1fr) 70px 105px 110px 40px;gap:8px;align-items:center;min-width:760px}.bill-line-head{padding:12px 10px;background:var(--soft);font-size:10px;font-weight:900;letter-spacing:.08em;color:var(--muted)}.bill-line-row{padding:9px 10px;border-top:1px solid var(--border)}.bill-line-row input,.bill-line-row select{width:100%;min-width:0;height:46px;padding:8px 9px;border:1px solid var(--border);border-radius:9px;background:var(--white);color:var(--text);font-size:13px}.bill-line-row input:focus,.bill-line-row select:focus{outline:2px solid rgba(65,155,125,.18);border-color:var(--green)}.line-number{font-size:12px;font-weight:900;color:var(--green);text-align:center}.compact-title{margin-top:22px!important}
+.bill-form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:18px;border-top:1px solid var(--border)}.bill-preview-pane .invoice-preview{position:sticky;top:12px;border-radius:18px;box-shadow:0 12px 40px rgba(10,30,25,.08)}.bill-preview-pane .invoice-item-preview strong{font-size:14px!important}.bill-preview-pane .invoice-totals{font-size:13px!important}.bill-preview-pane .invoice-totals strong{font-size:18px!important}
+
+.material-card{position:relative}.material-card-actions{display:flex;gap:7px;align-items:center;margin-left:auto}.material-card{gap:14px!important;padding:18px!important}.material-card h3{font-size:18px!important}.material-card p{font-size:13px!important}
+.quotation-page-performance{margin-bottom:20px}.quotation-page-performance>div:first-child{background:linear-gradient(135deg,var(--white),var(--green-light))}.quotation-page-performance>div:first-child strong{font-size:27px;color:var(--green)}.quotation-form-card input,.quotation-form-card select,.quotation-form-card textarea{min-height:50px;font-size:15px!important}.quotation-form-card label{font-size:13px!important;font-weight:800}.quotation-form-card .settings-form{gap:16px!important}.quotation-row-button{font-size:14px!important;cursor:pointer}.quotation-row-button:hover{background:var(--green-light)}
+
+.staff-grid-rich{gap:18px!important}.staff-card-rich{min-height:300px;display:flex;flex-direction:column;gap:12px!important}.staff-card-rich .customer-card-actions{margin-top:auto;display:grid!important;grid-template-columns:1fr 1fr;gap:9px}.staff-summary-grid{gap:15px!important}.staff-summary-grid .report-box{min-height:125px;padding:19px!important}.staff-summary-grid .report-box strong{font-size:23px!important}.modal{max-width:920px!important;width:min(920px,94vw)!important;max-height:92vh;overflow:auto;padding:24px!important}.modal-head h2{font-size:26px!important}.modal-head p{font-size:14px!important}.modal-grid{gap:15px!important}.form-section-label{margin-top:8px!important;margin-bottom:13px!important;padding:12px 0!important;border-bottom:1px solid var(--border)}.form-section-label span{font-size:11px!important}.form-section-label small{font-size:12px!important}.modal-footer{margin-top:20px!important;padding-top:18px!important}
+
+.theme-dark .billing-action-strip,.theme-dark .billing-table-card,.theme-dark .billing-kpi-grid>div,.theme-dark .quotation-performance-bar>div,.theme-dark .bill-line-editor,.theme-dark .bill-line-row input,.theme-dark .bill-line-row select,.theme-dark .icon-action{background:#121c1a!important;border-color:#31433e!important;color:#edf5f2!important}.theme-dark .billing-list-head{background:#1a2824!important;color:#b5c8c1!important}.theme-dark .billing-list-row{border-color:#2a3b36!important;color:#edf5f2}.theme-dark .billing-action-strip>div strong,.theme-dark .billing-kpi-grid strong,.theme-dark .billing-table-title h3,.theme-dark .quotation-performance-bar strong{color:#edf5f2!important}.theme-dark .bill-preview-pane{background:#0b1211!important}.theme-dark .linked-info{background:#121c1a!important;border-color:#31433e!important}.theme-dark .bill-builder-clean .bill-builder-head,.theme-dark .bill-form-pane{background:#121c1a!important}.theme-dark .bill-builder-clean .bill-builder-head{border-color:#2c3d38!important}.theme-dark .staff-card-rich,.theme-dark .customer-card-premium,.theme-dark .supplier-premium-card{background:#121c1a!important;border-color:#2d403a!important}.theme-dark .staff-card-rich p,.theme-dark .staff-contact-lines span,.theme-dark .supplier-contact-stack span{color:#b8c8c3!important}.theme-dark .modal,.theme-dark .modal-head{background:#121c1a!important;color:#edf5f2!important}.theme-dark .modal .field input,.theme-dark .modal .field select,.theme-dark .modal .field textarea{background:#0c1513!important;color:#edf5f2!important;border-color:#30423c!important}.theme-dark .material-card{background:#121c1a!important;border-color:#2d403a!important}.theme-dark .quotation-form-card,.theme-dark .quotation-document{background:#121c1a!important;border-color:#2d403a!important}
+@media(max-width:1050px){.billing-kpi-grid{grid-template-columns:repeat(2,1fr)}.billing-quotation-bar,.quotation-page-performance{grid-template-columns:repeat(2,1fr)}.bill-builder-clean .bill-builder-grid{grid-template-columns:1fr!important}.bill-preview-pane{display:none}.finance-inline{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.app .page-title h1{font-size:27px!important}.billing-action-strip{align-items:stretch;flex-direction:column}.billing-kpi-grid{grid-template-columns:1fr 1fr}.billing-quotation-bar,.quotation-page-performance{grid-template-columns:1fr 1fr}.customer-inline,.quotation-inline,.finance-inline{grid-template-columns:1fr}.billing-list-head{display:none}.billing-list-row{grid-template-columns:1fr 1fr;gap:8px;padding:15px}.billing-list-row .billing-row-actions{grid-column:1/-1;justify-content:flex-start}.bill-form-pane{padding:18px!important}.bill-builder-clean .bill-builder-head{padding:18px!important}.bill-builder-clean .bill-builder-head h2{font-size:23px!important}.modal-grid{grid-template-columns:1fr!important}}
+`;
+
+const AL_KANZ_REDESIGN_CSS = `
+/* 2026 client-ready redesign: warm luxury + accessible night mode */
+.app-day { --bg:#f3efe8; --surface:#fffdf9; --surface-2:#f8f4ed; --surface-3:#eee7dc; --text:#1e2523; --muted:#68716d; --border:#ddd5c9; --primary:#164c46; --primary-2:#256b61; --primary-soft:#e5f0ed; --accent:#c49a62; --danger:#b84e4e; --warning:#b67a2e; --shadow:0 18px 50px rgba(40,35,27,.09); background:radial-gradient(circle at 80% 0%,rgba(196,154,98,.16),transparent 30%),var(--bg); color:var(--text); }
+.app-night { --bg:#0b0d10; --surface:#15181c; --surface-2:#1b1f24; --surface-3:#23282e; --text:#f6f3ed; --muted:#a6acae; --border:#343a40; --primary:#b7df72; --primary-2:#8fc85b; --primary-soft:rgba(183,223,114,.11); --accent:#d4a768; --danger:#ff7777; --warning:#f1bd69; --shadow:0 24px 70px rgba(0,0,0,.45); background:radial-gradient(circle at 8% 0%,rgba(183,223,114,.09),transparent 28%),radial-gradient(circle at 95% 10%,rgba(212,167,104,.09),transparent 24%),var(--bg); color:var(--text); }
+.app-day .sidebar{background:#173f3a}.app-night .sidebar{background:#111418;border-right:1px solid #2f3439}.app-day .brand-logo{background:#d9b67d;color:#173f3a}.app-night .brand-logo{background:#b7df72;color:#10140d}
+.app .page-title h1,.app .page-intro h1{font-size:34px!important;letter-spacing:-.03em}.app .page-title p,.app .page-intro p{font-size:15px!important}.app label,.app .field label,.app .field span,.app input,.app select,.app textarea,.app button{font-size:14px}.app .field input,.app .field select,.app .field textarea{min-height:50px}.app small{font-size:12px}.app .card,.app .stat,.app .material-card,.app .staff-card,.app .supplier-premium-card{border-radius:18px}.app .card{box-shadow:var(--shadow)}
+.app .bill-line-head,.app .bill-line-row{grid-template-columns:36px minmax(190px,1.45fr) minmax(170px,1.2fr) 80px 125px 125px 42px;gap:10px}.app .bill-line-head{font-size:12px!important;padding:14px}.app .bill-line-row{padding:10px 12px}.app .bill-line-row input,.app .bill-line-row select{height:50px;font-size:14px!important}.app .customer-inline{grid-template-columns:1fr 1fr}.app .finance-inline{grid-template-columns:repeat(4,1fr)}
+.app .inventory-toolbar{display:flex;justify-content:space-between;align-items:center;margin:0 0 18px;padding:13px 16px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);color:var(--muted);font-size:14px}.inventory-toolbar span{display:flex;align-items:center;gap:8px}.app .material-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}.app .material-card{padding:22px!important;min-height:190px}.app .material-card h3{font-size:20px!important}.app .material-card p{font-size:15px!important}.app .material-card .stock strong{font-size:25px!important}
+.app .staff-grid-rich{grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:22px!important}.app .staff-card-rich{padding:24px!important;min-height:350px}.app .staff-card-rich h3{font-size:21px!important}.app .staff-contact-lines{gap:10px!important}.app .staff-salary-box{padding:15px!important}.app .staff-metrics{gap:12px!important}.app .staff-metrics>div{padding:14px!important}
+.performance-hero{display:grid;grid-template-columns:1fr 220px;gap:24px;align-items:center;padding:30px;border-radius:22px;background:linear-gradient(135deg,var(--primary),#2d7569);color:white;margin-bottom:20px;box-shadow:0 22px 55px rgba(23,63,58,.22)}.performance-hero span{font-size:12px;font-weight:900;letter-spacing:.13em;opacity:.75}.performance-hero strong{display:block;font-size:54px;line-height:1;margin:10px 0}.performance-hero p{margin:0;font-size:15px;opacity:.8}.performance-ring{width:170px;height:170px;border-radius:50%;display:grid;place-items:center;margin:auto;background:conic-gradient(var(--accent) 0 72%,rgba(255,255,255,.15) 72%);position:relative}.performance-ring:after{content:"";position:absolute;inset:12px;border-radius:50%;background:#1f5d55}.performance-ring>div{position:relative;z-index:1;text-align:center}.performance-ring strong{font-size:34px;margin:0}.performance-ring span{display:block;font-size:11px}.performance-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.performance-table-card{padding-bottom:24px}.performance-status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:0 24px}.performance-status-grid>div{padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2)}.performance-status-grid span{display:block;color:var(--muted);font-size:13px}.performance-status-grid strong{display:block;font-size:28px;margin:7px 0 12px}.performance-status-grid i{display:block;height:7px;border-radius:999px;background:var(--primary)}
+.login-v2{min-height:100vh;position:relative;overflow:hidden;background:#07100e;color:#f7f4ea;display:grid;place-items:center;padding:34px;font-family:inherit}.login-v2-shell{width:min(1180px,100%);min-height:690px;display:grid;grid-template-columns:1.12fr .88fr;position:relative;z-index:3;border:1px solid rgba(207,234,167,.16);border-radius:32px;overflow:hidden;background:rgba(13,24,21,.82);box-shadow:0 40px 120px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.05);backdrop-filter:blur(24px)}.login-v2-showcase{position:relative;padding:48px 54px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;background:linear-gradient(145deg,rgba(27,60,51,.92),rgba(8,23,20,.92))}.login-v2-showcase:after{content:"";position:absolute;inset:auto -20% -40% 25%;height:70%;background:radial-gradient(circle,rgba(188,239,101,.16),transparent 62%);pointer-events:none}.login-v2-top{display:flex;align-items:center;gap:13px;position:relative;z-index:2}.login-v2-logo{width:54px;height:54px;border-radius:17px;display:grid;place-items:center;background:#c9f36b;color:#12221d;box-shadow:0 12px 35px rgba(201,243,107,.2)}.login-v2-top b{display:block;font-size:17px;letter-spacing:.08em}.login-v2-top span{display:block;font-size:9px;letter-spacing:.2em;color:#aebdb7;margin-top:3px}.login-v2-copy{position:relative;z-index:2;margin-top:30px}.login-v2-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(201,243,107,.2);background:rgba(201,243,107,.07);border-radius:999px;color:#d2f486;font-size:10px;font-weight:900;letter-spacing:.14em}.login-v2-pill i{width:7px;height:7px;border-radius:50%;background:#c9f36b;box-shadow:0 0 14px #c9f36b;animation:loginPulse 1.7s infinite}.login-v2-copy h1{font-size:clamp(42px,5vw,68px);line-height:.98;letter-spacing:-.055em;margin:20px 0 18px}.login-v2-copy h1 em{font-style:normal;color:#c9f36b}.login-v2-copy p{max-width:540px;color:#b8c6c0;font-size:16px;line-height:1.65;margin:0}.login-v2-preview{position:relative;z-index:2;width:min(520px,100%);padding:22px;border:1px solid rgba(255,255,255,.09);border-radius:20px;background:rgba(4,13,11,.46);box-shadow:0 20px 60px rgba(0,0,0,.2);animation:loginFloat 6s ease-in-out infinite}.preview-top,.preview-stat-row,.preview-footer{display:flex;justify-content:space-between;align-items:center}.preview-top{font-size:9px;letter-spacing:.16em;color:#8d9f98}.preview-top b{color:#c9f36b;font-size:9px}.preview-stat-row{justify-content:flex-start;gap:60px;margin:20px 0}.preview-stat-row small{display:block;color:#7f938b;font-size:8px;letter-spacing:.12em}.preview-stat-row strong{display:block;font-size:20px;margin-top:6px}.preview-bars{height:70px;display:flex;align-items:end;gap:8px;border-bottom:1px solid rgba(255,255,255,.07)}.preview-bars i{display:block;flex:1;height:30%;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#c9f36b,#4d8b69);animation:barWave 2.8s ease-in-out infinite alternate}.preview-bars i:nth-child(2){height:55%;animation-delay:.2s}.preview-bars i:nth-child(3){height:40%;animation-delay:.4s}.preview-bars i:nth-child(4){height:78%;animation-delay:.6s}.preview-bars i:nth-child(5){height:58%;animation-delay:.8s}.preview-bars i:nth-child(6){height:88%;animation-delay:1s}.preview-bars i:nth-child(7){height:68%;animation-delay:1.2s}.preview-bars i:nth-child(8){height:96%;animation-delay:1.4s}.preview-footer{margin-top:14px;color:#7f938b;font-size:9px}.login-v2-form-wrap{display:grid;place-items:center;padding:50px;background:rgba(6,13,12,.72)}.login-v2-card{width:min(420px,100%);display:flex;flex-direction:column;gap:19px}.login-v2-heading>span{font-size:10px;font-weight:900;letter-spacing:.18em;color:#9db8a8}.login-v2-heading h2{font-size:34px;line-height:1.08;letter-spacing:-.04em;margin:9px 0 8px}.login-v2-heading p{font-size:14px;color:#8fa09a;margin:0;line-height:1.5}.login-field{display:grid;gap:8px}.login-field>span{font-size:10px;font-weight:900;letter-spacing:.13em;color:#a8b8b1}.login-input-wrap{height:58px;display:flex;align-items:center;gap:11px;padding:0 15px;border-radius:14px;border:1px solid #2c4038;background:#101b18;transition:.25s ease;box-shadow:inset 0 1px rgba(255,255,255,.025)}.login-input-wrap:focus-within{border-color:#a9d85d;box-shadow:0 0 0 4px rgba(201,243,107,.09),0 12px 30px rgba(0,0,0,.16)}.login-input-wrap svg{color:#718a7d;flex:0 0 auto}.login-input-wrap input{width:100%;height:100%;border:0!important;outline:0;background:transparent!important;color:#f7f4ea!important;font-size:15px!important;padding:0!important;box-shadow:none!important}.login-input-wrap input::placeholder{color:#60736b}.password-toggle{border:0;background:transparent;color:#70867b;display:grid;place-items:center;cursor:pointer;padding:5px}.login-v2-error{display:flex;gap:9px;align-items:flex-start;padding:12px 13px;border-radius:12px;background:rgba(180,62,62,.12);border:1px solid rgba(239,115,115,.2);color:#ffb0b0;font-size:12px;line-height:1.45}.login-v2-submit{height:58px;border:0;border-radius:14px;background:#c9f36b;color:#101c16;display:flex;align-items:center;justify-content:space-between;padding:0 17px 0 20px;font-size:14px;font-weight:950;cursor:pointer;box-shadow:0 14px 34px rgba(201,243,107,.18);transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}.login-v2-submit:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 18px 42px rgba(201,243,107,.25);filter:brightness(1.04)}.login-v2-submit:disabled{opacity:.65;cursor:wait}.login-arrow{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#173127;font-size:19px;color:#d9f58d}.login-v2-security{display:flex;justify-content:center;align-items:center;gap:7px;color:#667b72;font-size:10px;margin-top:2px}.login-v2-security svg{color:#94b55c}.login-v2-security i{width:3px;height:3px;border-radius:50%;background:#44564e}.login-v2-mobile-brand{display:none}.login-v2-footer{position:absolute;z-index:4;bottom:13px;left:0;right:0;text-align:center;color:#50645b;font-size:9px;letter-spacing:.12em}.login-v2-footer span{color:#9eb65f;margin:0 5px}.login-orb{position:absolute;border-radius:50%;filter:blur(2px);pointer-events:none}.orb-a{width:480px;height:480px;left:-170px;top:-150px;background:radial-gradient(circle,rgba(177,232,92,.14),transparent 66%);animation:orbDrift 12s ease-in-out infinite}.orb-b{width:560px;height:560px;right:-200px;bottom:-230px;background:radial-gradient(circle,rgba(68,154,121,.15),transparent 67%);animation:orbDrift 15s ease-in-out infinite reverse}.orb-c{width:260px;height:260px;right:25%;top:-120px;background:radial-gradient(circle,rgba(208,181,87,.08),transparent 70%);animation:orbDrift 10s ease-in-out infinite}.login-grid{position:absolute;inset:0;opacity:.22;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:46px 46px;mask-image:linear-gradient(to bottom,black,transparent 80%)}.login-noise{position:absolute;inset:0;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}.auth-loading{min-height:100vh;display:grid;place-items:center;align-content:center;gap:14px;background:#07100e;color:#c9f36b;font-weight:800}.auth-spinner{width:30px;height:30px;border:3px solid #20342d;border-top-color:#c9f36b;border-radius:50%;animation:akspin 1s linear infinite}@keyframes loginPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.72)}}@keyframes loginFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}@keyframes barWave{from{transform:scaleY(.82);transform-origin:bottom}to{transform:scaleY(1);transform-origin:bottom}}@keyframes orbDrift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,18px) scale(1.08)}}
+.app-night .inventory-toolbar,.app-night .auth-card{background:var(--surface);border-color:var(--border)}.app-night .auth-screen{background:#0b0d10}.app-night .auth-shell{background:#15181c;border-color:#343a40}.app-night .auth-card input{background:#0f1215;color:#f6f3ed;border-color:#343a40}.app-night .auth-card-head p{color:#a6acae}.app-night .auth-loading{background:#0b0d10;color:#b7df72}
+@media(max-width:1050px){.performance-grid{grid-template-columns:repeat(2,1fr)}.app .finance-inline{grid-template-columns:repeat(2,1fr)}.login-v2-shell{grid-template-columns:1fr}.login-v2-showcase{min-height:430px}.login-v2-form-wrap{padding:44px}}@media(max-width:700px){.app .page-title h1,.app .page-intro h1{font-size:29px!important}.performance-hero{grid-template-columns:1fr}.performance-grid,.performance-status-grid{grid-template-columns:1fr}.app .inventory-toolbar{align-items:flex-start;gap:8px;flex-direction:column}.app .bill-line-head,.app .bill-line-row{min-width:850px}.login-v2{padding:14px}.login-v2-shell{border-radius:22px;min-height:0}.login-v2-showcase{min-height:360px;padding:30px 25px}.login-v2-copy h1{font-size:40px}.login-v2-copy p{font-size:14px}.login-v2-preview{display:none}.login-v2-form-wrap{padding:34px 23px}.login-v2-heading h2{font-size:28px}.login-v2-footer{font-size:8px}.login-v2-security{flex-wrap:wrap}}
+`;
+
+
+
+/* ========================= AL KANZ — NEW UI ========================= */
+const AL_KANZ_NEW_UI = `
+:root{
+  --ak-accent:#238b70;
+  --ak-accent-2:#46b997;
+  --ak-ink:#15231f;
+  --ak-muted:#71817b;
+  --ak-bg:#f5f7f5;
+  --ak-card:#ffffff;
+  --ak-line:#e5ebe8;
+  --ak-shadow:0 14px 40px rgba(20,48,40,.07);
+}
+.app.theme-day{
+  --bg:#f5f7f5!important; --white:#fff!important; --soft:#f8faf9!important;
+  --green:#238b70!important; --green-dark:#176451!important; --green-light:#e5f4ee!important;
+  --sidebar:#10231e!important; --sidebar-2:#18372e!important; --sidebar-text:#b8cbc4!important;
+  --text:#15231f!important; --text-2:#65756f!important; --muted:#8a9893!important;
+  --border:#e4ebe7!important; --shadow:0 14px 40px rgba(20,48,40,.07)!important;
+}
+.app.theme-day{background:var(--bg)!important}
+.app.theme-night{
+  --bg:#0b1210!important; --white:#101a17!important; --soft:#121e1a!important;
+  --green:#58c9a3!important; --green-dark:#3eaa88!important; --green-light:#17382e!important;
+  --sidebar:#08120f!important; --sidebar-2:#10241d!important; --sidebar-text:#a9c1b8!important;
+  --text:#eef7f3!important; --text-2:#b1c2bc!important; --muted:#71827b!important;
+  --border:#22352f!important; --shadow:0 18px 55px rgba(0,0,0,.24)!important;
+}
+.app{font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif!important;letter-spacing:0!important}
+.app::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 85% 8%,rgba(70,185,150,.07),transparent 25%),radial-gradient(circle at 15% 90%,rgba(35,139,112,.045),transparent 24%)}
+.sidebar{width:248px!important;border-right:1px solid rgba(255,255,255,.06)!important;box-shadow:12px 0 40px rgba(5,25,19,.08)!important}
+.brand-area{padding:26px 20px 18px!important}
+.brand{gap:11px!important}
+.brand-logo{width:42px!important;height:42px!important;border-radius:13px!important;box-shadow:0 8px 22px rgba(91,210,163,.18)!important}
+.brand strong{font-size:13px!important;letter-spacing:.9px!important}
+.brand span{font-size:8px!important;letter-spacing:1.5px!important}
+.workshop-status{margin:10px 16px!important;height:38px!important;border-radius:12px!important;background:rgba(255,255,255,.075)!important;border:1px solid rgba(255,255,255,.08)!important;color:#d7e6e0!important}
+.nav-scroll{padding:15px 12px 18px!important}
+.nav-section-title{font-size:7px!important;letter-spacing:1.7px!important;padding:14px 11px 7px!important;color:#7f9990!important}
+.nav-item{min-height:42px!important;padding:0 11px!important;border-radius:11px!important;font-size:10px!important;gap:11px!important;color:var(--sidebar-text)!important}
+.nav-item:hover{background:rgba(255,255,255,.055)!important;color:#fff!important;transform:translateX(2px)}
+.nav-item.active{background:linear-gradient(135deg,rgba(51,178,139,.95),rgba(29,116,94,.95))!important;color:#fff!important;box-shadow:0 8px 22px rgba(30,130,104,.22)!important}
+.nav-item svg{width:17px!important;height:17px!important}
+.sub-menu{padding:4px 0 7px 37px!important}
+.sub-menu button{min-height:30px!important;border-radius:8px!important;font-size:9px!important;color:#9bb2aa!important}
+.account-card{margin:10px 12px!important;padding:11px!important;border-radius:14px!important;background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.07)!important}
+.account-avatar{width:34px!important;height:34px!important;border-radius:10px!important}
+.logout{border-radius:9px!important}
+.main{position:relative!important;z-index:1!important}
+.topbar{height:70px!important;padding:0 26px!important;background:rgba(245,247,245,.82)!important;border-bottom:1px solid var(--border)!important;backdrop-filter:blur(18px)!important}
+.app.theme-night .topbar{background:rgba(11,18,16,.82)!important}
+.breadcrumb{font-size:9px!important;color:var(--muted)!important}
+.breadcrumb strong{color:var(--text)!important;font-size:10px!important}
+.global-search{height:40px!important;border-radius:12px!important;border:1px solid var(--border)!important;background:var(--card)!important;box-shadow:0 4px 15px rgba(20,48,40,.035)!important}
+.global-search input{font-size:10px!important}
+.ai-help-button,.notification,.admin-profile{height:40px!important;border-radius:12px!important}
+.ai-help-button{background:var(--green)!important;color:#fff!important;box-shadow:0 7px 18px rgba(35,139,112,.18)!important}
+.admin-profile{border:1px solid var(--border)!important;background:var(--card)!important}
+.quick-nav{padding:14px 26px 0!important;background:transparent!important}
+.quick-nav-inner{min-height:43px!important;padding:5px!important;border-radius:13px!important;background:rgba(255,255,255,.72)!important;backdrop-filter:blur(15px)!important;box-shadow:0 6px 20px rgba(20,48,40,.035)!important}
+.app.theme-night .quick-nav-inner{background:rgba(16,26,23,.72)!important}
+.quick-nav-button{height:33px!important;padding:0 12px!important;border-radius:9px!important;font-size:9px!important}
+.quick-nav-button.active{background:var(--green)!important}
+.page{padding:26px!important}
+.page-heading{padding:8px 0 24px!important}
+.page-heading h1{font-size:35px!important;line-height:1.05!important;letter-spacing:-1.5px!important;font-weight:800!important}
+.page-heading p,.page-intro{font-size:11px!important;color:var(--muted)!important;line-height:1.6!important}
+.hero{min-height:250px!important;border-radius:25px!important;border:1px solid var(--border)!important;box-shadow:0 22px 60px rgba(20,48,40,.10)!important;overflow:hidden!important}
+.hero-text h2{font-size:39px!important;letter-spacing:-2px!important}
+.hero-text p{font-size:11px!important;line-height:1.65!important}
+.stats{gap:12px!important;margin-top:14px!important}
+.stat-card{min-height:118px!important;padding:18px!important;border-radius:18px!important;border:1px solid var(--border)!important;box-shadow:var(--ak-shadow)!important;background:var(--card)!important;transition:transform .2s ease,box-shadow .2s ease!important}
+.stat-card:hover{transform:translateY(-4px)!important;box-shadow:0 18px 45px rgba(20,48,40,.11)!important}
+.stat-card strong{font-size:24px!important}
+.stat-card small{font-size:8px!important}
+.two-column{gap:14px!important}
+.card{border-radius:20px!important;border:1px solid var(--border)!important;box-shadow:var(--ak-shadow)!important;background:var(--card)!important}
+.card-header{padding:17px 18px!important}
+.card-header h2{font-size:13px!important;font-weight:800!important}
+.card-header p{font-size:8px!important}
+.table-wrap{border-radius:14px!important}
+table th{font-size:7px!important;letter-spacing:1px!important;padding:11px!important}
+table td{font-size:10px!important;padding:12px 11px!important}
+.row-action{width:31px!important;height:31px!important;border-radius:9px!important;background:var(--soft)!important}
+.primary-button,.secondary-button,.danger-button{height:40px!important;padding:0 15px!important;border-radius:11px!important;font-size:9px!important;font-weight:800!important}
+.primary-button{background:var(--green)!important;box-shadow:0 8px 20px rgba(35,139,112,.17)!important}
+.secondary-button{background:var(--card)!important;border:1px solid var(--border)!important}
+input,select,textarea{border-radius:10px!important;border-color:var(--border)!important;background:var(--card)!important;color:var(--text)!important;font-size:10px!important}
+input,select{min-height:40px!important}
+textarea{min-height:90px!important}
+.modal{border-radius:22px!important;border:1px solid var(--border)!important;box-shadow:0 30px 100px rgba(0,0,0,.25)!important}
+.modal-header{padding:20px 22px!important}
+.modal-header h2{font-size:18px!important}
+.toast{border-radius:13px!important;box-shadow:0 15px 40px rgba(0,0,0,.16)!important}
+/* cleaner dashboard rhythm */
+.dashboard-grid,.performance-grid,.report-grid{gap:14px!important}
+/* motion */
+.card,.stat-card,.hero,.quick-nav-inner{animation:akRise .45s cubic-bezier(.2,.75,.2,1) both}
+.stat-card:nth-child(2){animation-delay:.04s}.stat-card:nth-child(3){animation-delay:.08s}.stat-card:nth-child(4){animation-delay:.12s}
+@keyframes akRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(max-width:850px){.topbar{padding:0 14px!important}.page{padding:18px!important}.quick-nav{padding:10px 14px 0!important}.sidebar{width:235px!important}}
+@media(max-width:600px){.topbar{height:60px!important}.page{padding:14px!important}.page-heading h1{font-size:28px!important}.hero-text h2{font-size:31px!important}.stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.quick-nav{padding:7px 8px 0!important}}
+`;
+
+
+
+/* ================= AL KANZ — LUXURY BLACK & GOLD THEME ================= */
+const AL_KANZ_LUXURY_GOLD_CSS = `
+/* Premium furniture-studio visual system */
+.app.theme-day,.app.theme-night{
+  --bg:#0b0b0c!important;
+  --white:#151516!important;
+  --soft:#1b1b1d!important;
+  --green:#d5b06a!important;
+  --green-dark:#b99149!important;
+  --green-light:rgba(213,176,106,.12)!important;
+  --sidebar:#09090a!important;
+  --sidebar-2:#141416!important;
+  --sidebar-text:#b6b2aa!important;
+  --text:#f3efe7!important;
+  --text-2:#c3beb4!important;
+  --muted:#88847d!important;
+  --border:#302e2a!important;
+  --shadow:0 20px 60px rgba(0,0,0,.34)!important;
+  background:#0b0b0c!important;
+  color:#f3efe7!important;
+}
+.app{font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif!important;background:#0b0b0c!important;color:#f3efe7!important}
+.app::before{background:radial-gradient(circle at 82% 5%,rgba(213,176,106,.075),transparent 25%),radial-gradient(circle at 12% 88%,rgba(213,176,106,.035),transparent 22%)!important}
+.sidebar{width:238px!important;background:linear-gradient(180deg,#09090a 0%,#101012 100%)!important;border-right:1px solid #292722!important;box-shadow:18px 0 55px rgba(0,0,0,.24)!important}
+.brand-area{padding:27px 20px 20px!important}
+.brand{gap:12px!important}
+.brand-logo{width:43px!important;height:43px!important;border-radius:13px!important;background:linear-gradient(145deg,#ead29b,#b98b43)!important;color:#17120a!important;box-shadow:0 10px 28px rgba(213,176,106,.18)!important}
+.brand strong{font-size:13px!important;letter-spacing:1.3px!important;color:#f3efe7!important}
+.brand span{font-size:8px!important;letter-spacing:1.8px!important;color:#8f8b84!important}
+.workshop-status{margin:10px 15px!important;height:38px!important;border-radius:11px!important;background:#141416!important;border:1px solid #302e2a!important;color:#cfc8ba!important}
+.workshop-status svg{color:#d5b06a!important}
+.nav-scroll{padding:17px 12px 20px!important}
+.nav-section-title{color:#6f6b64!important;font-size:7px!important;letter-spacing:1.9px!important}
+.nav-item{min-height:43px!important;padding:0 12px!important;border-radius:10px!important;font-size:10px!important;color:#aaa69e!important;transition:all .22s ease!important}
+.nav-item:hover{background:#18181a!important;color:#f2ede4!important;transform:translateX(2px)!important}
+.nav-item.active{background:linear-gradient(135deg,#d5b06a,#b48b49)!important;color:#15120d!important;box-shadow:0 9px 25px rgba(213,176,106,.16)!important}
+.nav-item.active svg{color:#15120d!important}
+.sub-menu button{color:#8e8a82!important;border-radius:8px!important}
+.sub-menu button:hover{background:#18181a!important;color:#e5dfd3!important}
+.account-card{margin:10px 12px!important;padding:11px!important;border-radius:14px!important;background:#141416!important;border:1px solid #2d2b27!important}
+.account-avatar{background:linear-gradient(145deg,#ead29b,#b98b43)!important;color:#17120a!important}
+.logout{color:#a39e94!important}
+.main{background:#0b0b0c!important}
+.topbar{height:70px!important;padding:0 27px!important;background:rgba(11,11,12,.88)!important;border-bottom:1px solid #292722!important;backdrop-filter:blur(20px)!important}
+.breadcrumb{color:#706c65!important;font-size:9px!important}.breadcrumb strong{color:#ddd7cc!important}
+.global-search{height:40px!important;border-radius:11px!important;background:#141416!important;border:1px solid #302e2a!important;box-shadow:none!important}
+.global-search input{color:#e9e4da!important;font-size:10px!important}.global-search input::placeholder{color:#716d66!important}
+.ai-help-button{background:#d5b06a!important;color:#16120b!important;box-shadow:0 8px 24px rgba(213,176,106,.14)!important}
+.notification{background:#141416!important;border-color:#302e2a!important;color:#bdb7ad!important}
+.admin-profile{background:#141416!important;border-color:#302e2a!important;color:#eee8dc!important}
+.quick-nav{padding:14px 27px 0!important;background:transparent!important}
+.quick-nav-inner{min-height:44px!important;padding:5px!important;border:1px solid #2e2c28!important;border-radius:12px!important;background:#111113!important;box-shadow:0 10px 35px rgba(0,0,0,.18)!important}
+.quick-nav-button{height:33px!important;border-radius:8px!important;font-size:9px!important;color:#99958d!important}
+.quick-nav-button:hover{color:#e7e1d7!important;background:#1b1b1d!important}
+.quick-nav-button.active{background:#d5b06a!important;color:#15120d!important}
+.page{padding:29px!important}
+.page-heading{padding:8px 0 25px!important}.page-heading h1{font-size:36px!important;line-height:1.02!important;letter-spacing:-1.7px!important;color:#f3efe7!important}.page-heading p,.page-intro{color:#8d8981!important;font-size:11px!important}
+.hero{border:1px solid #332f28!important;background:linear-gradient(135deg,#171513,#111113)!important;box-shadow:0 25px 70px rgba(0,0,0,.32)!important;border-radius:24px!important}
+.hero::after{opacity:.45!important;background:radial-gradient(circle at 80% 35%,rgba(213,176,106,.13),transparent 30%)!important}
+.hero-text h2{font-size:40px!important;letter-spacing:-2.2px!important;color:#f5f0e6!important}.hero-text h2 em{color:#d5b06a!important}.hero-text p{color:#99938a!important}
+.stat-card{background:#141416!important;border:1px solid #302e2a!important;border-radius:16px!important;box-shadow:0 15px 40px rgba(0,0,0,.22)!important;min-height:120px!important;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease!important}
+.stat-card:hover{transform:translateY(-4px)!important;border-color:#5a4b31!important;box-shadow:0 20px 55px rgba(0,0,0,.32)!important}
+.stat-card strong{color:#f2ede3!important;font-size:25px!important}.stat-card small{color:#817d75!important}.stat-card svg{color:#d5b06a!important}
+.card{background:#131315!important;border:1px solid #302e2a!important;border-radius:18px!important;box-shadow:0 17px 50px rgba(0,0,0,.22)!important}
+.card-header{padding:18px 20px!important;border-bottom:1px solid #292722!important}.card-header h2{color:#eee9df!important;font-size:14px!important}.card-header p{color:#7f7a72!important}
+.table-wrap{border-color:#2d2b27!important;background:#111113!important}table th{background:#161618!important;color:#77736c!important;border-bottom:1px solid #2e2c28!important}table td{color:#cfc9bf!important;border-bottom:1px solid #242321!important}table tr:hover td{background:#171719!important}
+.row-action{background:#19191b!important;color:#aaa59c!important;border:1px solid #2d2b27!important}.row-action:hover{color:#d5b06a!important;border-color:#5a4b31!important}
+.primary-button,.secondary-button,.danger-button{height:41px!important;border-radius:10px!important;font-size:9px!important}.primary-button{background:linear-gradient(135deg,#e0bd79,#bd914d)!important;color:#15120d!important;box-shadow:0 9px 25px rgba(213,176,106,.15)!important}.secondary-button{background:#151517!important;color:#d5cfc4!important;border:1px solid #35312a!important}.danger-button{background:#351b1b!important;color:#efaaa0!important;border:1px solid #59302c!important}
+input,select,textarea{background:#101012!important;color:#eee8df!important;border:1px solid #34312b!important;border-radius:10px!important}input:focus,select:focus,textarea:focus{border-color:#9f7b43!important;box-shadow:0 0 0 3px rgba(213,176,106,.08)!important}input::placeholder,textarea::placeholder{color:#66635e!important}
+.modal-overlay{background:rgba(0,0,0,.72)!important;backdrop-filter:blur(7px)!important}.modal{background:#141416!important;border:1px solid #3a352c!important;box-shadow:0 35px 110px rgba(0,0,0,.62)!important;border-radius:20px!important}.modal-header{border-bottom:1px solid #2d2b27!important}.modal-header h2{color:#f0ebe2!important}.modal-header button{color:#a39d92!important}
+.toast{background:#18181a!important;border:1px solid #3a352c!important;color:#e7e0d4!important}
+/* Billing */
+.bill-builder-clean,.billing-table-card,.billing-action-strip,.billing-form-card{background:#131315!important;border-color:#302e2a!important;color:#eee8df!important}
+.bill-line-head{background:#171719!important;color:#77736b!important;border-color:#2b2926!important}.bill-line-row{border-color:#292723!important;background:#111113!important}.bill-line-row:hover{background:#171719!important}
+/* Materials / staff cards */
+.material-card,.staff-card,.staff-card-rich,.supplier-premium-card{background:#141416!important;border-color:#302e2a!important}.material-card:hover,.staff-card-rich:hover{border-color:#5a4b31!important;box-shadow:0 20px 55px rgba(0,0,0,.28)!important}.material-card h3,.staff-card-rich h3{color:#eee8de!important}.material-card p,.staff-contact-lines,.staff-contact-lines *{color:#8c877f!important}.material-card .stock strong{color:#d5b06a!important}
+/* Reports / performance */
+.performance-hero{background:linear-gradient(135deg,#211b12,#141416)!important;border:1px solid #4b3b24!important;box-shadow:0 25px 65px rgba(0,0,0,.32)!important}.performance-ring{background:conic-gradient(#d5b06a 0 72%,#34302a 72%)!important}.performance-ring:after{background:#171719!important}.performance-status-grid>div{background:#151517!important;border-color:#302e2a!important}.performance-status-grid i{background:#d5b06a!important}
+/* Login */
+.ak-login-page{background:#080809!important;color:#f3eee5!important}
+.ak-login-grid{opacity:.24!important;background-image:linear-gradient(rgba(213,176,106,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(213,176,106,.055) 1px,transparent 1px)!important}
+.ak-login-orb{background:rgba(213,176,106,.11)!important;filter:blur(16px)!important}
+.ak-login-company h1{color:#f1ece2!important;letter-spacing:.16em!important}.ak-login-company p{color:#8a847b!important}
+.ak-login-card{background:rgba(20,20,22,.93)!important;border:1px solid #3a352d!important;box-shadow:0 35px 100px rgba(0,0,0,.62),inset 0 1px rgba(255,255,255,.035)!important;backdrop-filter:blur(25px)!important}
+.ak-login-brand-mark{background:linear-gradient(145deg,#ead29b,#b98b43)!important;color:#16120b!important;box-shadow:0 12px 35px rgba(213,176,106,.18)!important}
+.ak-login-heading h1{color:#f3eee5!important}.ak-login-heading p{color:#8d8880!important}
+.ak-login-role{background:#101012!important;border-color:#34312b!important;color:#99958d!important}.ak-login-role:hover{border-color:#6b5534!important;color:#eee8de!important}.ak-login-role.active{background:rgba(213,176,106,.10)!important;border-color:#c9a25f!important;color:#dfbd7c!important;box-shadow:0 0 0 3px rgba(213,176,106,.05)!important}
+.ak-login-input{background:#0f0f11!important;border-color:#34312b!important}.ak-login-input:focus-within{border-color:#b08a4b!important;box-shadow:0 0 0 4px rgba(213,176,106,.08)!important}.ak-login-input svg{color:#827b70!important}.ak-login-input input{color:#f2ede4!important}.ak-login-input input::placeholder{color:#615e58!important}.ak-login-eye{color:#817a70!important}.ak-login-button{background:linear-gradient(135deg,#e3c27f,#bd914d)!important;color:#17130c!important;box-shadow:0 12px 32px rgba(213,176,106,.16)!important}.ak-login-error{background:rgba(150,45,38,.11)!important;border-color:#53302b!important;color:#e9a39a!important}
+/* remove green visual residue from common badges */
+.badge,.status-badge,.pill{border-color:#3a352c!important}.success,.status-success{color:#d5b06a!important}
+@keyframes akGoldRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.page>.card,.page>.hero,.page>.stats{animation:akGoldRise .45s ease both}
+@media(max-width:800px){.sidebar{width:225px!important}.topbar{padding:0 16px!important}.quick-nav{padding-left:16px!important;padding-right:16px!important}.page{padding:20px!important}}
+@media(max-width:600px){.page-heading h1{font-size:29px!important}.hero-text h2{font-size:32px!important}.stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+`;
+
+
+
+/* ============================================================
+   AL KANZ FINAL THEME — LIGHT DAY / NIGHT VISION
+   The application defaults to a bright light workspace.
+   Night mode is a deliberate low-light alternative.
+============================================================ */
+const AL_KANZ_DAY_NIGHT_CSS = `
+/* ---------- DAY / LIGHT ---------- */
+.app.theme-day {
+  color-scheme: light !important;
+  --bg:#f6f7f5 !important;
+  --white:#ffffff !important;
+  --soft:#fbfcfa !important;
+  --green:#b18a3e !important;
+  --green-dark:#8e6c2d !important;
+  --green-light:#f5eddc !important;
+  --sidebar:#171717 !important;
+  --sidebar-2:#242424 !important;
+  --sidebar-text:#c9c4b9 !important;
+  --text:#191919 !important;
+  --text-2:#55524c !important;
+  --muted:#8c8982 !important;
+  --border:#e6e4df !important;
+  --blue:#47779a !important;
+  --blue-light:#edf4f8 !important;
+  --orange:#a56c2e !important;
+  --orange-light:#fbf1e4 !important;
+  --purple:#725e91 !important;
+  --purple-light:#f1edf6 !important;
+  --red:#a4514a !important;
+  --red-light:#faecea !important;
+  --shadow:0 10px 30px rgba(30,27,22,.065) !important;
+  background:#f6f7f5 !important;
+  color:#191919 !important;
+}
+
+.app.theme-day,
+.app.theme-day .main,
+.app.theme-day .content,
+.app.theme-day .page {
+  background:#f6f7f5 !important;
+  color:#191919 !important;
+}
+
+.app.theme-day::before {
+  background:
+    radial-gradient(circle at 88% 4%,rgba(196,158,84,.10),transparent 24%),
+    radial-gradient(circle at 8% 90%,rgba(130,151,140,.055),transparent 25%) !important;
+}
+
+.app.theme-day .sidebar {
+  background:linear-gradient(180deg,#ffffff 0%,#faf9f6 100%) !important;
+  color:#292824 !important;
+  border-right:1px solid #e6e2d9 !important;
+  box-shadow:8px 0 28px rgba(35,30,20,.055) !important;
+}
+
+.app.theme-day .brand strong {
+  color:#24231f !important;
+}
+
+.app.theme-day .brand span {
+  color:#8a867d !important;
+}
+
+.app.theme-day .brand-logo,
+.app.theme-day .account-avatar {
+  background:linear-gradient(145deg,#f0d79e,#c69b54) !important;
+  color:#241c0e !important;
+  box-shadow:0 5px 16px rgba(170,130,55,.16) !important;
+}
+
+.app.theme-day .workshop-status {
+  background:#f5faf7 !important;
+  border:1px solid #dce9e1 !important;
+  color:#46564f !important;
+}
+
+.app.theme-day .nav-section-title {
+  color:#9a958b !important;
+}
+
+.app.theme-day .nav-item,
+.app.theme-day .sub-menu button {
+  color:#625f58 !important;
+}
+
+.app.theme-day .nav-item:hover,
+.app.theme-day .sub-menu button:hover {
+  background:#f6f2e9 !important;
+  color:#292722 !important;
+}
+
+.app.theme-day .nav-item.active,
+.app.theme-day .nav-item.selected,
+.app.theme-day .sub-menu button.sub-selected {
+  background:linear-gradient(135deg,#ead09a,#d6b66f) !important;
+  color:#29200f !important;
+  box-shadow:0 5px 16px rgba(177,138,62,.13) !important;
+}
+
+.app.theme-day .nav-item.active svg,
+.app.theme-day .nav-item.selected svg {
+  color:#5b431b !important;
+}
+
+.app.theme-day .sidebar-account {
+  border-top:1px solid #e7e3da !important;
+}
+
+.app.theme-day .sidebar-account .account-card {
+  background:#ffffff !important;
+  border:1px solid #e6e2d9 !important;
+  color:#292722 !important;
+  box-shadow:0 5px 18px rgba(35,30,20,.045) !important;
+}
+.app.theme-day .nav-section-title { color:#807c74 !important; }
+.app.theme-day .nav-item,
+.app.theme-day .sub-menu button { color:#b9b4aa !important; }
+.app.theme-day .nav-item:hover,
+.app.theme-day .sub-menu button:hover { background:#30302f !important; color:#fff !important; }
+.app.theme-day .nav-item.active,
+.app.theme-day .nav-item.selected,
+.app.theme-day .sub-menu button.sub-selected {
+  background:linear-gradient(135deg,#d7b56f,#bd9550) !important;
+  color:#211a0e !important;
+  box-shadow:0 7px 20px rgba(180,139,65,.16) !important;
+}
+
+.app.theme-day .topbar {
+  background:rgba(255,255,255,.92) !important;
+  border-bottom:1px solid #e5e3de !important;
+  color:#191919 !important;
+  box-shadow:0 4px 18px rgba(20,20,20,.035) !important;
+}
+.app.theme-day .breadcrumb { color:#96928a !important; }
+.app.theme-day .breadcrumb strong { color:#35332f !important; }
+.app.theme-day .global-search {
+  background:#fff !important;
+  border:1px solid #dedbd4 !important;
+  color:#292722 !important;
+  box-shadow:0 4px 15px rgba(30,25,15,.035) !important;
+}
+.app.theme-day .global-search input { color:#222 !important; }
+.app.theme-day .global-search input::placeholder { color:#aaa69d !important; }
+.app.theme-day .ai-help-button {
+  background:linear-gradient(135deg,#d7b56f,#bd9550) !important;
+  color:#211a0e !important;
+}
+.app.theme-day .notification,
+.app.theme-day .admin-profile,
+.app.theme-day .mobile-menu {
+  background:#fff !important;
+  border-color:#dedbd4 !important;
+  color:#55524c !important;
+}
+
+.app.theme-day .quick-nav-inner {
+  background:#fff !important;
+  border:1px solid #e1ded7 !important;
+  box-shadow:0 5px 20px rgba(30,25,15,.035) !important;
+}
+.app.theme-day .quick-nav-button { color:#74716b !important; }
+.app.theme-day .quick-nav-button:hover { background:#f7f5f0 !important; color:#26231e !important; }
+.app.theme-day .quick-nav-button.active {
+  background:#f5eddc !important;
+  color:#8d6b2d !important;
+}
+
+.app.theme-day .page-heading h1,
+.app.theme-day .page-title h1,
+.app.theme-day .page-heading h2,
+.app.theme-day h1,
+.app.theme-day h2,
+.app.theme-day h3,
+.app.theme-day strong { color:#1b1b1a !important; }
+.app.theme-day .page-heading p,
+.app.theme-day .page-intro,
+.app.theme-day .page-title p,
+.app.theme-day .card-header p,
+.app.theme-day small { color:#7f7c75 !important; }
+
+/* Every normal frame/card is actually LIGHT in Day mode. */
+.app.theme-day .card,
+.app.theme-day .table-card,
+.app.theme-day .jobs-modern-card,
+.app.theme-day .settings-card,
+.app.theme-day .appearance-card,
+.app.theme-day .customer-card,
+.app.theme-day .customer-card-premium,
+.app.theme-day .supplier-premium-card,
+.app.theme-day .staff-card,
+.app.theme-day .staff-card-rich,
+.app.theme-day .material-card,
+.app.theme-day .report-card,
+.app.theme-day .reports-chart-card,
+.app.theme-day .chart-card,
+.app.theme-day .stat-card,
+.app.theme-day .account-big-card,
+.app.theme-day .daily-expense-card,
+.app.theme-day .quotation-form-card,
+.app.theme-day .quotation-document,
+.app.theme-day .billing-transactions-card,
+.app.theme-day .billing-table-card,
+.app.theme-day .billing-action-strip,
+.app.theme-day .bill-builder-clean,
+.app.theme-day .bill-form-pane,
+.app.theme-day .modal,
+.app.theme-day .job-drawer,
+.app.theme-day .crm-profile-modal,
+.app.theme-day .report-control-panel,
+.app.theme-day .ai-suggestion-grid button,
+.app.theme-day .crm-search,
+.app.theme-day .security-row,
+.app.theme-day .notification-setting {
+  background:#ffffff !important;
+  color:#191919 !important;
+  border-color:#e3e0d9 !important;
+  box-shadow:0 10px 30px rgba(30,27,22,.055) !important;
+}
+
+.app.theme-day .stat-card:hover,
+.app.theme-day .card:hover,
+.app.theme-day .customer-card:hover,
+.app.theme-day .material-card:hover,
+.app.theme-day .staff-card:hover,
+.app.theme-day .report-card:hover {
+  border-color:#d7c59e !important;
+  box-shadow:0 16px 38px rgba(55,43,22,.09) !important;
+}
+
+.app.theme-day .hero {
+  background:linear-gradient(135deg,#fffdf8,#f7f3e9) !important;
+  border:1px solid #e5dcc9 !important;
+  color:#191919 !important;
+  box-shadow:0 18px 45px rgba(65,48,20,.07) !important;
+}
+.app.theme-day .hero-text h2,
+.app.theme-day .hero-text h2 em { color:#1b1b1a !important; }
+.app.theme-day .hero-text h2 em { color:#9a752f !important; }
+.app.theme-day .hero-text p { color:#77736b !important; }
+
+.app.theme-day .table-wrap,
+.app.theme-day table { background:#fff !important; }
+.app.theme-day table th,
+.app.theme-day .table-head {
+  background:#f7f5f0 !important;
+  color:#77736b !important;
+  border-color:#e7e3dc !important;
+}
+.app.theme-day table td,
+.app.theme-day .table-row {
+  background:#fff !important;
+  color:#25231f !important;
+  border-color:#ece9e3 !important;
+}
+.app.theme-day table tr:hover td,
+.app.theme-day .table-row:hover { background:#fcfaf5 !important; }
+
+.app.theme-day input,
+.app.theme-day select,
+.app.theme-day textarea,
+.app.theme-day .field input,
+.app.theme-day .field select,
+.app.theme-day .settings-form input,
+.app.theme-day .settings-form select,
+.app.theme-day .settings-form textarea,
+.app.theme-day .jobs-search-modern,
+.app.theme-day .jobs-status-filter,
+.app.theme-day .bill-line-row input,
+.app.theme-day .bill-line-row select,
+.app.theme-day .ai-input input {
+  background:#fff !important;
+  color:#222 !important;
+  border-color:#ddd9d1 !important;
+}
+.app.theme-day input::placeholder,
+.app.theme-day textarea::placeholder { color:#aaa59c !important; }
+.app.theme-day input:focus,
+.app.theme-day select:focus,
+.app.theme-day textarea:focus {
+  border-color:#bd9550 !important;
+  box-shadow:0 0 0 3px rgba(189,149,80,.11) !important;
+}
+
+.app.theme-day .primary-button,
+.app.theme-day .create-bill-button,
+.app.theme-day .jobs-new-button {
+  background:linear-gradient(135deg,#d9b875,#bc914c) !important;
+  color:#211a0e !important;
+  box-shadow:0 8px 22px rgba(180,139,65,.15) !important;
+}
+.app.theme-day .secondary-button,
+.app.theme-day .filter-button,
+.app.theme-day .icon-action,
+.app.theme-day .row-action {
+  background:#fff !important;
+  color:#55524c !important;
+  border-color:#dedad2 !important;
+}
+
+.app.theme-day .modal-overlay { background:rgba(20,20,18,.42) !important; }
+.app.theme-day .modal-header { border-color:#e5e1d9 !important; }
+.app.theme-day .modal-header h2 { color:#1b1b1a !important; }
+
+/* ---------- NIGHT VISION ---------- */
+.app.theme-night {
+  color-scheme: dark !important;
+  --bg:#0d0e10 !important;
+  --white:#17181b !important;
+  --soft:#1d1f22 !important;
+  --green:#d8b56c !important;
+  --green-dark:#b99149 !important;
+  --green-light:rgba(216,181,108,.12) !important;
+  --sidebar:#090a0b !important;
+  --sidebar-2:#141517 !important;
+  --sidebar-text:#bbb6ad !important;
+  --text:#f2eee6 !important;
+  --text-2:#c1bcb3 !important;
+  --muted:#85827c !important;
+  --border:#302f2d !important;
+  --shadow:0 18px 55px rgba(0,0,0,.28) !important;
+  background:#0d0e10 !important;
+  color:#f2eee6 !important;
+}
+.app.theme-night,
+.app.theme-night .main,
+.app.theme-night .content,
+.app.theme-night .page { background:#0d0e10 !important; color:#f2eee6 !important; }
+.app.theme-night::before { background:radial-gradient(circle at 82% 5%,rgba(216,181,108,.08),transparent 25%),radial-gradient(circle at 12% 88%,rgba(216,181,108,.035),transparent 24%) !important; }
+.app.theme-night .sidebar { background:linear-gradient(180deg,#090a0b,#131416) !important; border-color:#2b2a27 !important; }
+.app.theme-night .brand strong { color:#f2eee6 !important; }
+.app.theme-night .brand span { color:#89857d !important; }
+.app.theme-night .brand-logo,.app.theme-night .account-avatar { background:linear-gradient(145deg,#ead29b,#b98b43) !important; color:#17130b !important; }
+.app.theme-night .workshop-status { background:#17181b !important; border-color:#302f2d !important; color:#d1cbc1 !important; }
+.app.theme-night .nav-item,.app.theme-night .sub-menu button { color:#aaa69d !important; }
+.app.theme-night .nav-item:hover,.app.theme-night .sub-menu button:hover { background:#1d1e21 !important; color:#f2eee6 !important; }
+.app.theme-night .nav-item.active,.app.theme-night .nav-item.selected,.app.theme-night .sub-menu button.sub-selected { background:linear-gradient(135deg,#d8b56c,#b99149) !important; color:#17130b !important; }
+.app.theme-night .topbar { background:rgba(13,14,16,.91) !important; border-color:#292826 !important; }
+.app.theme-night .global-search,.app.theme-night .notification,.app.theme-night .admin-profile,.app.theme-night .mobile-menu { background:#17181b !important; border-color:#302f2d !important; color:#d8d2c8 !important; }
+.app.theme-night .global-search input { color:#f2eee6 !important; }
+.app.theme-night .quick-nav-inner { background:#141518 !important; border-color:#302f2d !important; }
+.app.theme-night .quick-nav-button { color:#9c9890 !important; }
+.app.theme-night .quick-nav-button:hover { background:#1d1f22 !important; color:#eee9df !important; }
+.app.theme-night .quick-nav-button.active { background:rgba(216,181,108,.13) !important; color:#dfbe7d !important; }
+.app.theme-night .page-heading h1,.app.theme-night .page-title h1,.app.theme-night h1,.app.theme-night h2,.app.theme-night h3,.app.theme-night strong { color:#f2eee6 !important; }
+.app.theme-night .page-heading p,.app.theme-night .page-title p,.app.theme-night .card-header p,.app.theme-night small { color:#89867f !important; }
+.app.theme-night .card,.app.theme-night .table-card,.app.theme-night .jobs-modern-card,.app.theme-night .settings-card,.app.theme-night .appearance-card,.app.theme-night .customer-card,.app.theme-night .customer-card-premium,.app.theme-night .supplier-premium-card,.app.theme-night .staff-card,.app.theme-night .staff-card-rich,.app.theme-night .material-card,.app.theme-night .report-card,.app.theme-night .reports-chart-card,.app.theme-night .chart-card,.app.theme-night .stat-card,.app.theme-night .account-big-card,.app.theme-night .daily-expense-card,.app.theme-night .quotation-form-card,.app.theme-night .quotation-document,.app.theme-night .billing-transactions-card,.app.theme-night .billing-table-card,.app.theme-night .billing-action-strip,.app.theme-night .bill-builder-clean,.app.theme-night .bill-form-pane,.app.theme-night .modal,.app.theme-night .job-drawer,.app.theme-night .crm-profile-modal,.app.theme-night .report-control-panel,.app.theme-night .ai-suggestion-grid button,.app.theme-night .crm-search,.app.theme-night .security-row,.app.theme-night .notification-setting { background:#17181b !important; color:#f2eee6 !important; border-color:#302f2d !important; box-shadow:0 18px 50px rgba(0,0,0,.25) !important; }
+.app.theme-night .table-wrap,.app.theme-night table { background:#141518 !important; }
+.app.theme-night table th,.app.theme-night .table-head { background:#1d1f22 !important; color:#85817a !important; border-color:#302f2d !important; }
+.app.theme-night table td,.app.theme-night .table-row { background:#17181b !important; color:#ded9d0 !important; border-color:#292927 !important; }
+.app.theme-night table tr:hover td,.app.theme-night .table-row:hover { background:#1d1f22 !important; }
+.app.theme-night input,.app.theme-night select,.app.theme-night textarea,.app.theme-night .field input,.app.theme-night .field select,.app.theme-night .settings-form input,.app.theme-night .settings-form select,.app.theme-night .settings-form textarea,.app.theme-night .jobs-search-modern,.app.theme-night .jobs-status-filter,.app.theme-night .bill-line-row input,.app.theme-night .bill-line-row select,.app.theme-night .ai-input input { background:#101114 !important; color:#f2eee6 !important; border-color:#383633 !important; }
+.app.theme-night input::placeholder,.app.theme-night textarea::placeholder { color:#68655f !important; }
+.app.theme-night .primary-button,.app.theme-night .create-bill-button,.app.theme-night .jobs-new-button { background:linear-gradient(135deg,#d8b56c,#b99149) !important; color:#17130b !important; }
+.app.theme-night .secondary-button,.app.theme-night .filter-button,.app.theme-night .icon-action,.app.theme-night .row-action { background:#1b1c1f !important; color:#d2cdc3 !important; border-color:#393733 !important; }
+.app.theme-night .hero { background:linear-gradient(135deg,#211c13,#17181b) !important; border-color:#4a3b25 !important; }
+.app.theme-night .hero-text h2,.app.theme-night .hero-text h2 em { color:#f2eee6 !important; }
+.app.theme-night .hero-text h2 em { color:#d8b56c !important; }
+.app.theme-night .modal-overlay { background:rgba(0,0,0,.72) !important; }
+.app.theme-night .modal-header { border-color:#302f2d !important; }
+.app.theme-night .modal-header h2 { color:#f2eee6 !important; }
+
+/* Theme chooser */
+.theme-preview-day { background:linear-gradient(135deg,#ffffff 0 50%,#eeeae0 50%) !important; }
+.theme-preview-night { background:linear-gradient(135deg,#17181b 0 50%,#d8b56c 50%) !important; }
+.theme-options-two { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+@media(max-width:700px){ .theme-options-two { grid-template-columns:1fr !important; } }
+`;
+
+const FINAL_CSS = CSS + AL_KANZ_NEW_UI + AL_KANZ_REDESIGN_CSS + AL_KANZ_FINAL_UI_CSS + AL_KANZ_BILL_TEMPLATE_CSS + AL_KANZ_CRM_DETAIL_CSS + AL_KANZ_PREMIUM_CRM_REPORT_CSS + AL_KANZ_FINAL_RESPONSIVE + AL_KANZ_FINAL_FIX + AL_KANZ_LAST_FIX + AL_KANZ_TRUE_FINAL_FIX + AL_KANZ_FULL_MOTION_CSS + AL_KANZ_LIGHT_UI + BILLING_BUTTON_FIX_CSS + AL_KANZ_LUXURY_GOLD_CSS + AL_KANZ_DAY_NIGHT_CSS;
 
 export default App;
